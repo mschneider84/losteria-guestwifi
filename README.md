@@ -23,6 +23,14 @@ php artisan portal:demo     # optional: Demo-Daten anlegen
 php artisan test
 ```
 
+### Laravel Cloud
+
+1. **Resources → Database**: eine MySQL-Datenbank anlegen und an die Umgebung *production* hängen. Laravel Cloud setzt `DB_CONNECTION`, `DB_HOST` usw. dann selbst – keine eigenen Variablen nötig.
+2. Optional **KV Store** (Valkey) anhängen: Cache und Sitzungen laufen dann automatisch dort.
+3. **Settings → Deployments → Deploy command**: `php artisan migrate --force`
+4. **Scheduler** einschalten (für Heartbeat und Löschfristen).
+5. Neu deployen, dann `https://<deine-domain>/setup` aufrufen und das erste Admin-Konto anlegen.
+
 Zeitplan (Laravel Cloud Scheduler): Heartbeat jede Minute, Löschfristen täglich 03:30 (`portal:purge`).
 
 ## Einrichtung auf der UDM SE

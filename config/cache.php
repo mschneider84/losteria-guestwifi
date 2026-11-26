@@ -15,7 +15,8 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    // KV-Speicher (Valkey/Redis) aus Laravel Cloud nutzen, sobald angehängt, sonst Datenbank
+    'default' => env('CACHE_STORE', (filled(env('REDIS_HOST')) && env('REDIS_HOST') !== '127.0.0.1' && extension_loaded('redis')) ? 'redis' : 'database'),
 
     /*
     |--------------------------------------------------------------------------

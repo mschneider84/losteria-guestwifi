@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.0.1', 'build' => 2, 'date' => '2026-11-26 23:54', 'type' => 'fix', 'area' => 'System', 'audience' => 'admin', 'source' => null, 'module' => 'system',
+        'text' => 'Läuft jetzt mit der MySQL-Datenbank von Laravel Cloud statt einer lokalen Datei. Ist ein KV-Speicher angehängt, werden Cache und Sitzungen dort abgelegt.',
+        'text_en' => 'Now runs on the Laravel Cloud MySQL database instead of a local file. If a KV store is attached, cache and sessions use it.'],
     ['version' => '1.0.0', 'build' => 1, 'date' => '2026-11-26 23:39', 'type' => 'new', 'area' => 'Gästeseite', 'audience' => 'all', 'source' => null, 'module' => 'portal',
         'text' => 'Eigene Gästeseite fürs WLAN: Deutsch, Englisch und Italienisch, Anmeldung per Klick mit Nutzungsbedingungen und freiwilliger Newsletter-Anmeldung mit Bestätigungs-Mail.',
         'text_en' => 'Own guest Wi-Fi page: German, English and Italian, one-click login with terms of use and optional newsletter sign-up with confirmation e-mail.'],
