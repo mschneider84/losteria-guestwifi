@@ -18,7 +18,9 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(UnifiClient::class, fn () => UnifiOsClient::fromSettings());
+        $this->app->bind(UnifiClient::class, fn () => Settings::get('unifi.mode') === 'local'
+            ? UnifiOsClient::fromSettings()
+            : \App\Services\Unifi\UnifiCloudClient::fromSettings());
         $this->app->singleton(UnifiManager::class);
     }
 

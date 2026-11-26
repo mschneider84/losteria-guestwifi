@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.2.0', 'build' => 4, 'date' => '2026-11-27 00:20', 'type' => 'new', 'area' => 'UniFi', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
+        'text' => 'Gäste werden jetzt über die UniFi-Cloud freigeschaltet – ohne VPN, Portfreigabe oder Zusatzgerät. In den Einstellungen nur den API-Schlüssel aus unifi.ui.com eintragen und die UDM SE auswählen.',
+        'text_en' => 'Guests are now authorized via the UniFi cloud – no VPN, port forwarding or extra device. Just enter the API key from unifi.ui.com in the settings and pick the UDM SE.'],
     ['version' => '1.1.0', 'build' => 3, 'date' => '2026-11-27 00:12', 'type' => 'new', 'area' => 'Schnittstelle', 'audience' => 'admin', 'source' => null, 'module' => 'api',
         'text' => 'Schnittstelle zum L\'Osteria Dashboard: Das Dashboard holt die WLAN-Auswertungen je Restaurant ab und schickt Marketingaktionen. Schlüssel legst du unter Einstellungen → Dashboard-Schnittstelle an.',
         'text_en' => 'Interface to the L\'Osteria dashboard: the dashboard fetches Wi-Fi statistics per restaurant and sends marketing campaigns. Create keys under Settings → Dashboard interface.'],

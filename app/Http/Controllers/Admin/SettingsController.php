@@ -24,7 +24,7 @@ class SettingsController extends Controller
 
     public function index(): View
     {
-        return view('admin.settings', ['groups' => self::GROUPS, 'fields' => Settings::FIELDS]);
+        return view('admin.settings', ['groups' => self::GROUPS, 'fields' => Settings::FIELDS, 'consoles' => Cache::get('unifi.consoles', [])]);
     }
 
     public function update(Request $request): RedirectResponse
@@ -52,6 +52,24 @@ class SettingsController extends Controller
         Activity::log('settings.updated', null, ['keys' => $changed]);
 
         return back()->with('ok', __('Einstellungen gespeichert.'));
+    }
+
+    public function loadConsoles(Request $request): RedirectResponse
+    {
+        if ($request->filled('unifi__cloud_api_key')) {
+            Settings::set('unifi.cloud_api_key', $request->input('unifi__cloud_api_key'));
+        }
+        try {
+            $consoles = \App\Services\Unifi\UnifiCloudClient::fromSettings()->consoles();
+            Cache::put('unifi.consoles', $consoles, 3600);
+            if (count($consoles) === 1 && ! Settings::has('unifi.console_id')) {
+                Settings::set('unifi.console_id', array_key_first($consoles));
+            }
+
+            return back()->with('ok', __(':n Konsole(n) gefunden. Bitte die UDM SE auswählen und speichern.', ['n' => count($consoles)]));
+        } catch (Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function testUnifi(UnifiManager $unifi): RedirectResponse

@@ -14,6 +14,22 @@
                 @php($name = str_replace('.', '__', $key))
                 @if($type === 'bool')
                     <label class="inline"><input type="checkbox" name="{{ $name }}" value="1" @checked(\App\Support\Settings::get($key))> {{ __($label) }}</label>
+                @elseif(str_starts_with($type, 'select:'))
+                    <label>{{ __($label) }}
+                        <select name="{{ $name }}">
+                            @foreach(explode(',', substr($type, 7)) as $opt)
+                                @php([$val, $text] = explode('=', $opt, 2))
+                                <option value="{{ $val }}" @selected(\App\Support\Settings::get($key) === $val)>{{ __($text) }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                @elseif($key === 'unifi.console_id' && $consoles)
+                    <label>{{ __($label) }}
+                        <select name="{{ $name }}">
+                            <option value="">{{ __('– bitte wählen –') }}</option>
+                            @foreach($consoles as $id => $text)<option value="{{ $id }}" @selected(\App\Support\Settings::get($key) === $id)>{{ $text }}</option>@endforeach
+                        </select>
+                    </label>
                 @elseif($secret)
                     <label>{{ __($label) }}
                         <input type="password" name="{{ $name }}" autocomplete="new-password" placeholder="{{ \App\Support\Settings::has($key) ? '•••••••• '.__('(gespeichert – leer lassen, um es zu behalten)') : __('noch nicht hinterlegt') }}">
@@ -25,8 +41,11 @@
                 @endif
             @endforeach
             @if($group === 'unifi')
-                <p class="muted small">{{ __('Tipp: Lege auf der UDM SE einen eigenen lokalen Benutzer nur für das Portal an (Rolle „Site Admin“ bzw. Hotspot-Operator, ohne Fernzugriff). Anleitung im Handbuch.') }}</p>
-                <button class="btn ghost" formaction="{{ route('admin.settings.unifi-test') }}" formmethod="post" name="_method" value="POST">🔌 {{ __('Verbindung testen') }}</button>
+                <p class="muted small">{{ __('Über die UniFi-Cloud braucht es weder VPN noch Portfreigabe: API-Schlüssel unter unifi.ui.com → API anlegen, speichern, dann „Konsolen laden“ und die UDM SE wählen.') }}</p>
+                <div class="row">
+                    <button class="btn ghost" formaction="{{ route('admin.settings.unifi-consoles') }}" formmethod="post" name="_method" value="POST">☁️ {{ __('Konsolen laden') }}</button>
+                    <button class="btn ghost" formaction="{{ route('admin.settings.unifi-test') }}" formmethod="post" name="_method" value="POST">🔌 {{ __('Verbindung testen') }}</button>
+                </div>
             @endif
         </section>
     @endforeach

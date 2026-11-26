@@ -54,6 +54,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminLocale::class])->prefix('ad
         Route::get('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'keys'])->name('api-keys.index');
         Route::post('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'storeKey'])->name('api-keys.store');
         Route::delete('/einstellungen/schnittstelle/{key}', [\App\Http\Controllers\Admin\IntegrationController::class, 'destroyKey'])->name('api-keys.destroy');
+        Route::post('/einstellungen/unifi-konsolen', [SettingsController::class, 'loadConsoles'])->name('settings.unifi-consoles');
         Route::post('/einstellungen/unifi-test', [SettingsController::class, 'testUnifi'])->name('settings.unifi-test');
     });
 

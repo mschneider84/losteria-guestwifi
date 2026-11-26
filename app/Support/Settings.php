@@ -16,10 +16,13 @@ class Settings
 {
     /** Schlüssel => [Gruppe, Bezeichnung, Typ, Standard, geheim] */
     public const FIELDS = [
-        'unifi.url' => ['unifi', 'Adresse der UDM SE', 'url', 'https://192.168.1.1', false],
-        'unifi.username' => ['unifi', 'Benutzer (lokales Service-Konto)', 'text', '', false],
-        'unifi.password' => ['unifi', 'Passwort', 'password', '', true],
-        'unifi.verify_tls' => ['unifi', 'Zertifikat prüfen', 'bool', false, false],
+        'unifi.mode' => ['unifi', 'Verbindung zur UDM', 'select:cloud=Über die UniFi-Cloud (empfohlen),local=Direkt (VPN/Freigabe nötig)', 'cloud', false],
+        'unifi.cloud_api_key' => ['unifi', 'Site Manager API-Schlüssel (unifi.ui.com → API)', 'password', '', true],
+        'unifi.console_id' => ['unifi', 'Konsole (UDM SE)', 'text', '', false],
+        'unifi.url' => ['unifi', 'Nur bei „Direkt“: Adresse der UDM SE', 'url', 'https://192.168.1.1', false],
+        'unifi.username' => ['unifi', 'Nur bei „Direkt“: Benutzer (lokales Service-Konto)', 'text', '', false],
+        'unifi.password' => ['unifi', 'Nur bei „Direkt“: Passwort', 'password', '', true],
+        'unifi.verify_tls' => ['unifi', 'Nur bei „Direkt“: Zertifikat prüfen', 'bool', false, false],
         'unifi.timeout' => ['unifi', 'Zeitlimit je Aufruf (Sekunden)', 'int', 8, false],
         'mail.host' => ['mail', 'SMTP-Server', 'text', '', false],
         'mail.port' => ['mail', 'SMTP-Port', 'int', 587, false],

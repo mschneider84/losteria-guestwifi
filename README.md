@@ -39,13 +39,19 @@ Zeitplan (Laravel Cloud Scheduler): Heartbeat jede Minute, Löschfristen täglic
 
 Die Bezeichnungen gelten für UniFi Network 9.x; je nach Version heißen Menüpunkte leicht anders.
 
-### 1. Service-Konto für das Portal
+### 1. Verbindung über die UniFi-Cloud (empfohlen)
 
-1. UniFi OS → **Admins & Users** → **Add Admin**.
-2. **Restrict to Local Access Only** einschalten (kein UI-Konto, kein Fernzugriff).
-3. Benutzername z. B. `gaeste-portal`, langes Zufallspasswort.
-4. Rolle für **Network**: *Site Admin* (bzw. eine eigene Rolle mit Gast-Verwaltung), alle anderen Apps: *None*.
-5. Im Portal unter **Einstellungen → UniFi / UDM SE** Adresse (`https://<IP-der-UDM>`), Benutzer und Passwort eintragen und **Verbindung testen** – die gefundenen Sites werden angezeigt.
+Das Portal schaltet Gäste über `api.ui.com` frei. Die Anfrage geht über die bestehende Cloud-Verbindung der UDM SE (Site Manager Connector) an die offizielle Network-API – **ohne VPN, Portfreigabe, feste IP oder Zusatzgerät**. So arbeiten auch kommerzielle Hotspot-Anbieter mit der „External Hotspot API“ von Ubiquiti.
+
+Voraussetzungen: UDM SE mit dem UI-Konto verbunden (Fernzugriff an), UniFi OS ≥ 5.0.3, UniFi Network ≥ 9.1.105.
+
+1. [unifi.ui.com](https://unifi.ui.com) → **API** → *Create API Key* (Organisations-Schlüssel, falls mehrere Standorte unter einer Organisation hängen).
+2. Im Portal **Einstellungen → UniFi / UDM SE**: „Über die UniFi-Cloud“ wählen, Schlüssel eintragen, **Konsolen laden**, UDM SE auswählen, speichern.
+3. **Verbindung testen** – die Sites der Konsole werden angezeigt. Die UniFi-Site eines Standorts ist ihr Kurzname (bei einer Site `default`).
+
+Grenzen des Connectors: 100 Anfragen pro Minute je Konsole (je Gast-Anmeldung 3 Anfragen), 25 Sekunden je Anfrage.
+
+Alternative „Direkt“ (nur mit VPN oder Freigabe): lokaler Benutzer auf der UDM (Admins & Users → *Restrict to Local Access Only*, Network: Site Admin), Adresse/Benutzer/Passwort eintragen.
 
 ### 2. Gästenetz auf „External Portal“ stellen
 
@@ -68,5 +74,5 @@ Vor der Freischaltung dürfen Gäste nur das Portal erreichen. Unter **Hotspot �
 ### Vor dem Pilot zu klären
 
 - **Feste IPv4 für das External Portal**: UniFi erwartet beim *External Portal Server* je nach Version eine IP-Adresse statt eines Domainnamens. Laravel Cloud hat keine feste IP. Lösung, falls nötig: eine kleine Weiterleitung auf einem Server mit fester IP, die `/guest/s/…` samt Parametern an die Portal-Domain weiterreicht.
-- **Weg vom Portal zur UDM-API**: Das Portal muss die UDM SE per HTTPS erreichen – über VPN oder eine Port-Freigabe, die nur die Adresse des Portals zulässt. Ohne feste Absender-IP ist eine VPN-Lösung bzw. ein Relay-Server sauberer.
+- **Erster echter Test über die Cloud**: Der Weg über `api.ui.com` ist nach Ubiquitis Dokumentation vorgesehen, aber erst mit eurer UDM SE wirklich bestätigt. Beim Pilot eine Anmeldung durchspielen; schlägt sie fehl, zeigt der Systemstatus die Fehlernummer und den Grund.
 - Rechtstexte: Links zu Nutzungsbedingungen, Datenschutzerklärung und Impressum unter **Einstellungen → Gästeseite** eintragen (bis dahin wird ein kurzer eingebauter Text gezeigt).
