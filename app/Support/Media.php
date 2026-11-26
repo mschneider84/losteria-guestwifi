@@ -19,6 +19,12 @@ class Media
 
     public static function diskName(): string
     {
-        return config('filesystems.default') === 's3' ? 's3' : 'public';
+        // Laravel Cloud setzt beim angehängten Bucket die AWS_*-Werte (und meist FILESYSTEM_DISK=s3)
+        $default = config('filesystems.default');
+        if ($default !== 'local' && $default !== 'public' && config("filesystems.disks.{$default}.driver") === 's3') {
+            return $default;
+        }
+
+        return filled(config('filesystems.disks.s3.bucket')) ? 's3' : 'public';
     }
 }

@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.2.1', 'build' => 5, 'date' => '2026-11-27 00:28', 'type' => 'fix', 'area' => 'System', 'audience' => 'admin', 'source' => null, 'module' => 'system',
+        'text' => 'Bilder (Logos, Aktionen) werden im Speicher von Laravel Cloud abgelegt – der Deploy mit angehängtem Bucket klappt jetzt.',
+        'text_en' => 'Images (logos, campaigns) are stored in the Laravel Cloud bucket – deploying with an attached bucket works now.'],
     ['version' => '1.2.0', 'build' => 4, 'date' => '2026-11-27 00:20', 'type' => 'new', 'area' => 'UniFi', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
         'text' => 'Gäste werden jetzt über die UniFi-Cloud freigeschaltet – ohne VPN, Portfreigabe oder Zusatzgerät. In den Einstellungen nur den API-Schlüssel aus unifi.ui.com eintragen und die UDM SE auswählen.',
         'text_en' => 'Guests are now authorized via the UniFi cloud – no VPN, port forwarding or extra device. Just enter the API key from unifi.ui.com in the settings and pick the UDM SE.'],
