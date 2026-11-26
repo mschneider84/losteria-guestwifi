@@ -20,6 +20,11 @@ Route::get('/wlan/{location:slug}/online', [PortalController::class, 'done'])->n
 Route::get('/newsletter/bestaetigen/{token}', [PortalController::class, 'confirm'])->name('newsletter.confirm');
 Route::get('/newsletter/abmelden/{token}', [PortalController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
+// Bilder (Logo, Aktionen) – immer über die Portal-Domain, damit sie im Walled Garden laden
+Route::get('/bild/logo/{location:slug}', [\App\Http\Controllers\MediaController::class, 'logo'])->name('media.logo');
+Route::get('/bild/aktion/{promotion}', [\App\Http\Controllers\MediaController::class, 'promotion'])->name('media.promotion');
+Route::get('/wlan/{location:slug}/aktion/{promotion}', [PortalController::class, 'promotionClick'])->name('portal.promotion');
+
 // Verwaltung
 Route::get('/', fn () => redirect()->route('admin.dashboard'));
 Route::get('/anmelden', [AuthController::class, 'showLogin'])->name('login');
@@ -39,12 +44,16 @@ Route::middleware(['auth', \App\Http\Middleware\AdminLocale::class])->prefix('ad
         Route::put('/standorte/{location}', [LocationController::class, 'update'])->name('locations.update');
     });
 
+    Route::get('/aktionen', [\App\Http\Controllers\Admin\IntegrationController::class, 'promotions'])->middleware('can:dashboard.view')->name('promotions.index');
     Route::get('/kontakte', [ContactController::class, 'index'])->middleware('can:contacts.view')->name('contacts.index');
     Route::get('/kontakte/export', [ContactController::class, 'export'])->middleware('can:contacts.export')->name('contacts.export');
 
     Route::middleware('can:settings.manage')->group(function () {
         Route::get('/einstellungen', [SettingsController::class, 'index'])->name('settings');
         Route::put('/einstellungen', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'keys'])->name('api-keys.index');
+        Route::post('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'storeKey'])->name('api-keys.store');
+        Route::delete('/einstellungen/schnittstelle/{key}', [\App\Http\Controllers\Admin\IntegrationController::class, 'destroyKey'])->name('api-keys.destroy');
         Route::post('/einstellungen/unifi-test', [SettingsController::class, 'testUnifi'])->name('settings.unifi-test');
     });
 

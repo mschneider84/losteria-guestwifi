@@ -99,7 +99,47 @@ class DemoData
             DB::table('newsletter_contacts')->insert($contacts);
         }
 
+        self::promotions(array_keys($ids));
+
         Cache::put('demo.stamp', $stamp, 86400);
+    }
+
+    /** Zwei erfundene Aktionen, wie sie das Dashboard schicken würde, samt Aufrufen und Klicks. */
+    private static function promotions(array $locationIds): void
+    {
+        $items = [
+            ['external_id' => 'demo-pizza-dezember', 'image' => 'aktion-pizza.jpg', 'priority' => 1, 'placement' => 'both',
+                'title' => ['de' => 'Pizza des Monats: Tartufo e Funghi', 'en' => 'Pizza of the month: Tartufo e Funghi', 'it' => 'Pizza del mese: Tartufo e Funghi'],
+                'text' => ['de' => 'Mit schwarzem Trüffel und Steinpilzen – nur im Dezember.', 'en' => 'With black truffle and porcini – December only.', 'it' => 'Con tartufo nero e porcini – solo a dicembre.'],
+                'cta_label' => ['de' => 'Zur Speisekarte', 'en' => 'See the menu', 'it' => 'Vedi il menù'], 'cta_url' => 'https://www.example.com/speisekarte',
+                'starts_at' => now()->subDays(20), 'ends_at' => now()->addDays(35)],
+            ['external_id' => 'demo-aperitivo', 'image' => 'aktion-aperitivo.jpg', 'priority' => 2, 'placement' => 'online',
+                'title' => ['de' => 'Aperitivo: Spritz für 5 €', 'en' => 'Aperitivo: Spritz for €5', 'it' => 'Aperitivo: Spritz a 5 €'],
+                'text' => ['de' => 'Montag bis Freitag von 17 bis 19 Uhr an der Bar.', 'en' => 'Monday to Friday, 5 to 7 pm at the bar.', 'it' => 'Dal lunedì al venerdì, dalle 17 alle 19 al bar.'],
+                'cta_label' => ['de' => 'Tisch reservieren', 'en' => 'Book a table', 'it' => 'Prenota un tavolo'], 'cta_url' => 'https://www.example.com/reservieren',
+                'weekdays' => '1,2,3,4,5', 'time_from' => '17:00', 'time_to' => '19:00', 'starts_at' => now()->subDays(40), 'ends_at' => null],
+        ];
+        foreach ($items as $item) {
+            $image = $item['image'];
+            unset($item['image']);
+            $path = 'aktionen/'.$image;
+            if (! \App\Support\Media::disk()->exists($path)) {
+                \App\Support\Media::disk()->put($path, file_get_contents(resource_path('demo/'.$image)));
+            }
+            $promotion = \App\Models\Promotion::updateOrCreate(['external_id' => $item['external_id'], 'is_demo' => true],
+                $item + ['image_path' => $path, 'active' => true, 'is_demo' => true]);
+
+            DB::table('promotion_stats')->where('promotion_id', $promotion->id)->delete();
+            $rows = [];
+            foreach ($locationIds as $locId) {
+                for ($d = 19; $d >= 0; $d--) {
+                    $views = mt_rand(40, 110);
+                    $rows[] = ['promotion_id' => $promotion->id, 'location_id' => $locId, 'day' => now()->subDays($d)->toDateString(),
+                        'views' => $views, 'clicks' => (int) round($views * mt_rand(3, 9) / 100)];
+                }
+            }
+            DB::table('promotion_stats')->insert($rows);
+        }
     }
 
     /** Mittags- und Abendspitze wie im Restaurant. */

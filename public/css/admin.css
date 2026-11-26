@@ -118,3 +118,6 @@ fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding:
     .tabbar a { flex: 1; text-align: center; padding: 7px 0; text-decoration: none; color: var(--ink); font-size: 18px; display: grid; } .tabbar span { font-size: 11px; color: var(--muted); }
     .fb-tab { display: none; } .checks li { grid-template-columns: 14px 1fr; } .checks li .muted { grid-column: 2; }
 }
+.promo-card { padding-top: 0; overflow: hidden; } .promo-thumb { width: calc(100% + 32px); margin: 0 -16px; aspect-ratio: 16 / 7; object-fit: cover; display: block; max-width: none; }
+.promo-card:not(:has(.promo-thumb)) { padding-top: 16px; }
+.keybox { border-color: var(--warn); display: grid; gap: 8px; } .key { font-size: 15px; padding: 8px 10px; word-break: break-all; user-select: all; }

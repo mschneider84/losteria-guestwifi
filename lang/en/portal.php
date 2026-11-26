@@ -36,4 +36,6 @@ return [
     'unsubscribed_title' => 'Unsubscribed',
     'unsubscribed_text' => 'You will no longer receive our newsletter.',
     'terms_text' => 'The Wi-Fi is provided free of charge and without warranty. Please do not use it for illegal content, file sharing or spam. Session time and bandwidth are limited. To connect you, your device identifier is processed briefly and stored only in hashed form.',
+    'promo_tag' => 'Special',
+    'promo_more' => 'Learn more',
 ];

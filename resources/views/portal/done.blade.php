@@ -10,13 +10,16 @@
     @if($newsletter)
         <div class="notice">✉️ {{ __('portal.done_newsletter') }}</div>
     @endif
+    @if($promotion)
+        @include('portal.promotion', ['promotion' => $promotion, 'withButton' => true])
+    @endif
     @if($redirect)
-        <p class="muted center" id="redir">{{ __('portal.done_redirect') }}</p>
+        @unless($promotion)<p class="muted center" id="redir">{{ __('portal.done_redirect') }}</p>@endunless
         <a href="{{ $redirect }}" class="btn">{{ __('portal.continue') }}</a>
     @endif
 @endsection
 
-@if($redirect && !$demo)
+@if($redirect && !$demo && !$promotion)
 @push('scripts')
 <script>setTimeout(function () { location.href = @json($redirect); }, 4000);</script>
 @endpush

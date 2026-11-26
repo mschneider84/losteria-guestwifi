@@ -92,7 +92,7 @@ class LocationController extends Controller
     private function storeLogo(Request $request, Location $location): void
     {
         if ($request->hasFile('logo')) {
-            $location->update(['logo_path' => $request->file('logo')->store('logos', 'public')]);
+            $location->update(['logo_path' => $request->file('logo')->store('logos', \App\Support\Media::diskName())]);
         }
     }
 

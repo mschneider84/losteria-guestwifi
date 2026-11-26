@@ -36,4 +36,6 @@ return [
     'unsubscribed_title' => 'Abgemeldet',
     'unsubscribed_text' => 'Sie erhalten keinen Newsletter mehr von uns.',
     'terms_text' => 'Das WLAN wird kostenlos und ohne Gewähr bereitgestellt. Bitte nutzen Sie es nicht für rechtswidrige Inhalte, Filesharing oder das Versenden von Spam. Die Nutzungsdauer und Bandbreite sind begrenzt. Zur Freischaltung wird die Gerätekennung kurzzeitig verarbeitet und nur verschlüsselt (gehasht) gespeichert.',
+    'promo_tag' => 'Aktion',
+    'promo_more' => 'Mehr erfahren',
 ];

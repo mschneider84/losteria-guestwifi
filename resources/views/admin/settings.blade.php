@@ -3,6 +3,7 @@
 @section('content')
 <h1>⚙️ {{ __('Einstellungen') }}</h1>
 <p class="muted">{{ __('Alle Zugänge und Schalter werden hier gepflegt, nicht in der Server-Konfiguration. Passwörter werden verschlüsselt gespeichert und nicht mehr angezeigt.') }}</p>
+<p><a href="{{ route('admin.api-keys.index') }}" class="btn ghost">🔌 {{ __('Dashboard-Schnittstelle (Auswertungen & Aktionen)') }}</a></p>
 <form method="post" action="{{ route('admin.settings.update') }}" class="formgrid">
     @csrf @method('PUT')
     @foreach($groups as $group => $title)

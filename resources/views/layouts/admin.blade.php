@@ -16,6 +16,7 @@
     <nav class="mainnav">
         @can('dashboard.view')<a href="{{ route('admin.dashboard') }}" @class(['active' => request()->routeIs('admin.dashboard')])>📊 {{ __('Übersicht') }}</a>@endcan
         @can('locations.manage')<a href="{{ route('admin.locations.index') }}" @class(['active' => request()->routeIs('admin.locations.*')])>📍 {{ __('Standorte') }}</a>@endcan
+        @can('dashboard.view')<a href="{{ route('admin.promotions.index') }}" @class(['active' => request()->routeIs('admin.promotions.*')])>📣 {{ __('Aktionen') }}</a>@endcan
         @can('contacts.view')<a href="{{ route('admin.contacts.index') }}" @class(['active' => request()->routeIs('admin.contacts.*')])>✉️ {{ __('Newsletter') }}</a>@endcan
         @can('status.view')<a href="{{ route('admin.status') }}" @class(['active' => request()->routeIs('admin.status')])>🩺 {{ __('Systemstatus') }}</a>@endcan
     </nav>
@@ -26,6 +27,7 @@
             <div class="menu">
                 <div class="menu-head"><strong>{{ $u->name }}</strong><span>{{ \App\Support\Permissions::ROLES[$u->role][0] ?? $u->role }}</span></div>
                 @can('settings.manage')<a href="{{ route('admin.settings') }}">⚙️ {{ __('Einstellungen') }}</a>@endcan
+                @can('settings.manage')<a href="{{ route('admin.api-keys.index') }}">🔌 {{ __('Dashboard-Schnittstelle') }}</a>@endcan
                 @can('users.manage')<a href="{{ route('admin.users.index') }}">👥 {{ __('Benutzer & Rollen') }}</a>@endcan
                 @can('demo')
                     <form method="post" action="{{ route('admin.demo') }}">@csrf<button>🎭 {{ session('demo') ? __('Demo-Modus beenden') : __('Demo-Modus') }}</button></form>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use App\Models\NewsletterContact;
+use App\Models\Promotion;
 use App\Services\Portal\GuestAuthorizer;
 use App\Support\Settings;
 use Illuminate\Http\RedirectResponse;
@@ -99,13 +100,31 @@ class PortalController extends Controller
         $lang = $this->lang($request);
         app()->setLocale($lang);
 
+        $promotion = Promotion::currentFor($location, 'online');
+        if ($promotion && ! $device['demo']) {
+            $promotion->count($location, 'views');
+        }
+
         return view('portal.done', [
+            'promotion' => $promotion,
             'location' => $location,
             'lang' => $lang,
             'demo' => (bool) $device['demo'],
             'newsletter' => $done['newsletter'],
             'redirect' => $location->redirect_url ?: ($device['url'] ?? null),
         ]);
+    }
+
+    /** Klick auf den Button einer Aktion (nur nach der Freischaltung sichtbar) – zählen und weiterleiten. */
+    public function promotionClick(Request $request, Location $location, Promotion $promotion): RedirectResponse
+    {
+        abort_unless($promotion->cta_url && $promotion->is_demo === $location->is_demo, 404);
+        $device = $request->session()->get("portal.{$location->id}");
+        if (! ($device['demo'] ?? false)) {
+            $promotion->count($location, 'clicks');
+        }
+
+        return redirect()->away($promotion->cta_url);
     }
 
     public function confirm(Request $request, string $token): View
@@ -135,7 +154,13 @@ class PortalController extends Controller
         $lang = $this->lang($request);
         app()->setLocale($lang);
 
+        $promotion = $invalid ? null : Promotion::currentFor($location, 'start');
+        if ($promotion && ! $demo) {
+            $promotion->count($location, 'views');
+        }
+
         return view('portal.show', [
+            'promotion' => $promotion,
             'location' => $location,
             'lang' => $lang,
             'demo' => $demo,

@@ -4,6 +4,7 @@ Eigene Gästeseite für das WLAN in den Restaurants. UniFi leitet Gäste auf die
 
 - **Gästeseite**: Deutsch, Englisch, Italienisch (Sprache des Handys wird erkannt), Klick-Login mit Nutzungsbedingungen, freiwillige Newsletter-Anmeldung mit Double-Opt-in, Weiterleitung nach dem Verbinden.
 - **Verwaltung** (`/admin`): Übersicht mit Anmeldungen pro Tag und Restaurant, Wiederkehrer, Sprachen, Stoßzeiten · Standorte mit eigenem Branding · Newsletter-Kontakte mit CSV-Export · Einstellungen · Systemstatus · Benutzer & Rollen · Wünsche & Fehler · Demo-Modus.
+- **Schnittstelle zum L'Osteria Dashboard** (`/api/v1`): Auswertungen je Restaurant abrufen, Marketingaktionen für die Gästeseite senden. Spezifikation: [`docs/dashboard-schnittstelle.md`](docs/dashboard-schnittstelle.md).
 - **Datenschutz**: MAC-Adressen werden nie im Klartext gespeichert (nur HMAC für die Wiederkehrer-Statistik). E-Mail nur bei aktiver Newsletter-Einwilligung, mit Zeitpunkt und Textversion. Automatische Löschfristen (Standard: Anmeldungen 90 Tage, unbestätigte Kontakte 14 Tage, abgemeldete 30 Tage).
 
 Aufbau nach dem AlpinNext Portal-Standard (siehe `CLAUDE.md`).
@@ -27,6 +28,7 @@ php artisan test
 
 1. **Resources → Database**: eine MySQL-Datenbank anlegen und an die Umgebung *production* hängen. Laravel Cloud setzt `DB_CONNECTION`, `DB_HOST` usw. dann selbst – keine eigenen Variablen nötig.
 2. Optional **KV Store** (Valkey) anhängen: Cache und Sitzungen laufen dann automatisch dort.
+2. **Object Storage** (Bucket) anhängen: Logos und Aktionsbilder werden dort gespeichert (Laravel Cloud setzt `FILESYSTEM_DISK=s3`). Ohne Bucket gehen hochgeladene Bilder beim nächsten Deploy verloren.
 3. **Settings → Deployments → Deploy command**: `php artisan migrate --force`
 4. **Scheduler** einschalten (für Heartbeat und Löschfristen).
 5. Neu deployen, dann `https://<deine-domain>/setup` aufrufen und das erste Admin-Konto anlegen.

@@ -15,6 +15,10 @@
         </div>
     </div>
 
+    @if($promotion)
+        @include('portal.promotion', ['promotion' => $promotion, 'withButton' => false])
+    @endif
+
     @if($invalid)
         <div class="notice">{{ __('portal.invalid', ['ssid' => $location->name]) }}</div>
     @else

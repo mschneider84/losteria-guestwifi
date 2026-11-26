@@ -42,7 +42,7 @@ class Location extends Model
 
     public function logoUrl(): ?string
     {
-        return $this->logo_path ? asset('storage/'.$this->logo_path) : null;
+        return $this->logo_path ? route('media.logo', [$this->slug, 'v' => substr(md5($this->logo_path), 0, 8)]) : null;
     }
 
     public function sessionLabel(): string

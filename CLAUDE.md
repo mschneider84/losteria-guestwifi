@@ -8,6 +8,7 @@ Gebaut nach dem **AlpinNext Portal-Standard** (Skill `alpinnext-portal-standard`
 - UniFi: `App\Services\Unifi\UnifiOsClient` (UniFi OS: `/api/auth/login`, `/proxy/network/api/s/{site}/cmd/stamgr`). Im Demo-Modus und in der Vorschau `DemoUnifiClient` – dort wird nie etwas an der UDM geändert.
 - Datenschutz: MAC nie im Klartext (`GuestSession::hashDevice`). E-Mail nur mit Newsletter-Einwilligung. Löschfristen in `routes/console.php` (`portal:purge`).
 - Demo-Daten: `App\Demo\DemoData::ensure()`, Datensätze mit `is_demo = true`, erfundene Namen, Mails auf `.example`.
+- Dashboard-Schnittstelle: `routes/api.php`, `Api\DashboardApiController`, Schlüssel `ApiKey` (nur Hash). Spezifikation `docs/dashboard-schnittstelle.md` bei Änderungen mitpflegen. Bilder immer über `App\Support\Media` + `MediaController` (Portal-Domain wegen Walled Garden).
 - Einstellungen nur in der DB (`App\Support\Settings::FIELDS`), nie neue `.env`-Zeilen.
 
 ## Noch offen gegenüber dem Standard (Ausbau nach dem Pilot)

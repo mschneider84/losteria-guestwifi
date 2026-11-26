@@ -36,4 +36,6 @@ return [
     'unsubscribed_title' => 'Iscrizione annullata',
     'unsubscribed_text' => 'Non riceverai più la nostra newsletter.',
     'terms_text' => 'Il Wi-Fi è offerto gratuitamente e senza garanzia. Non utilizzarlo per contenuti illegali, file sharing o spam. Durata e banda sono limitate. Per la connessione l’identificativo del dispositivo viene trattato brevemente e salvato solo in forma cifrata (hash).',
+    'promo_tag' => 'Promozione',
+    'promo_more' => 'Scopri di più',
 ];

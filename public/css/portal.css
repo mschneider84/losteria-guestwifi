@@ -65,3 +65,11 @@ h1 { font-family: var(--serif); font-weight: 600; font-size: 26px; line-height: 
     .bg { background: radial-gradient(1200px 600px at 50% -10%, color-mix(in srgb, var(--brand) 25%, transparent), transparent 70%), var(--cream); }
 }
 @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+/* Marketingaktion aus dem Dashboard */
+.promo { margin: 4px 0 20px; border-radius: 14px; overflow: hidden; background: color-mix(in srgb, var(--brand) 7%, var(--panel)); border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line)); }
+.promo-img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; max-width: 100%; }
+.promo-body { padding: 14px 16px 16px; display: grid; gap: 6px; }
+.promo-tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); font-weight: 700; }
+.promo h2 { font-family: var(--serif); font-size: 20px; line-height: 1.25; margin: 0; }
+.promo p { margin: 0; font-size: 14px; color: var(--muted); }
+.promo-btn { margin-top: 8px; padding: 11px 16px; font-size: 15px; }
