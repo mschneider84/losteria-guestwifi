@@ -16,6 +16,7 @@ class SettingsController extends Controller
 {
     public const GROUPS = [
         'unifi' => '📡 UniFi / UDM SE',
+        'network' => '📶 Netzwerk-Auswertungen',
         'portal' => '🌐 Gästeseite',
         'privacy' => '🔒 Datenschutz & Löschfristen',
         'mail' => '✉️ E-Mail',

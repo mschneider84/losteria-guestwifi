@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\Promotion;
+use App\Services\Network\NetworkStats;
 use App\Services\PromotionImporter;
 use App\Services\StatsService;
 use App\Support\Activity;
@@ -56,6 +57,41 @@ class DashboardApiController extends Controller
         $result = Cache::remember($key, $to->isPast() ? 600 : 60, fn () => $stats->summary($from, $to, $location));
 
         return response()->json($result);
+    }
+
+    /** Live-Auslastung je Standort und Bereich. */
+    public function occupancy(Request $request, NetworkStats $network): JsonResponse
+    {
+        $location = $this->locationParam($request);
+
+        return response()->json(['daten' => $network->live(false, $location)]);
+    }
+
+    /** Netzwerk-Auswertung eines Zeitraums (Bereiche, Auslastung, Verweildauer, Stammgäste, Aktionen, Technik). */
+    public function network(Request $request, NetworkStats $network): JsonResponse
+    {
+        $data = $request->validate([
+            'von' => ['nullable', 'date_format:Y-m-d'],
+            'bis' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:von'],
+        ]);
+        $location = $this->locationParam($request);
+        $to = isset($data['bis']) ? CarbonImmutable::parse($data['bis'])->endOfDay() : CarbonImmutable::now()->endOfDay();
+        $from = isset($data['von']) ? CarbonImmutable::parse($data['von'])->startOfDay() : $to->subDays(29)->startOfDay();
+        if ($from->diffInDays($to) > 92) {
+            return response()->json(['error' => 'Zeitraum höchstens 92 Tage.'], 422);
+        }
+
+        $key = 'api.network.'.md5(json_encode([$from, $to, $location?->id]));
+
+        return response()->json(Cache::remember($key, $to->isPast() ? 900 : 120, fn () => $network->analysis($from, $to, false, $location)));
+    }
+
+    private function locationParam(Request $request): ?Location
+    {
+        $request->validate(['standort' => ['nullable', 'string', 'max:100']]);
+        $slug = $request->query('standort');
+
+        return $slug ? Location::where('slug', $slug)->where('is_demo', false)->firstOrFail() : null;
     }
 
     public function promotions(): JsonResponse

@@ -44,6 +44,8 @@ Route::middleware(['auth', \App\Http\Middleware\AdminLocale::class])->prefix('ad
         Route::put('/standorte/{location}', [LocationController::class, 'update'])->name('locations.update');
     });
 
+    Route::get('/netzwerk', [\App\Http\Controllers\Admin\NetworkController::class, 'index'])->middleware('can:dashboard.view')->name('network');
+    Route::put('/netzwerk/{location}/bereiche', [\App\Http\Controllers\Admin\NetworkController::class, 'updateAreas'])->middleware('can:locations.manage')->name('network.areas');
     Route::get('/aktionen', [\App\Http\Controllers\Admin\IntegrationController::class, 'promotions'])->middleware('can:dashboard.view')->name('promotions.index');
     Route::get('/kontakte', [ContactController::class, 'index'])->middleware('can:contacts.view')->name('contacts.index');
     Route::get('/kontakte/export', [ContactController::class, 'export'])->middleware('can:contacts.export')->name('contacts.export');

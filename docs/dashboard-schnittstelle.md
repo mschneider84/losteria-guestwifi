@@ -109,13 +109,42 @@ Antwort `201` (neu) bzw. `200` (geändert) mit `{"daten": {…}}`, darin `bild_i
 ### `DELETE /aktionen/{id}`
 Entfernt Aktion und Bild. Antwort `204`. Die bisherigen Aufrufe/Klicks verschwinden mit – vorher abholen, falls sie im Dashboard bleiben sollen.
 
+### `GET /auslastung?standort=<slug>` – Live-Auslastung
+Letzte Momentaufnahme (alle 5 Minuten, höchstens 15 Minuten alt; sonst `stand: null`). `standort` optional.
+
+```json
+{"daten": [{
+  "standort": {"slug": "muenchen", "name": "Osteria Centrale", "stadt": "München"},
+  "stand": "2026-11-27T19:35:00+01:00",
+  "geraete": 61, "gaeste": 57,
+  "auslastung_quote": 0.68, "hoechststand_30_tage": 84,
+  "bereiche": [{"bereich": "Innen", "geraete": 30, "gaeste": 30}, {"bereich": "Terrasse", "geraete": 15, "gaeste": 15}, {"bereich": "Bar", "geraete": 16, "gaeste": 12}]
+}]}
+```
+- `gaeste` = Geräte im Gäste-WLAN, `geraete` = alle Geräte (inkl. Personal). `auslastung_quote` = Gäste ÷ höchster Stand der letzten 30 Tage.
+
+### `GET /netzwerk?von=2026-11-01&bis=2026-11-30&standort=<slug>` – Netzwerk-Auswertung
+Zeitraum höchstens 92 Tage (Standard: letzte 30 Tage). Je Standort:
+
+| Block | Inhalt |
+|---|---|
+| `bereiche[]` | `bereich`, `anteil` (0–1), `hoechststand`, `pro_stunde` {0–23: Ø anwesende Gastgeräte} |
+| `auslastung` | `heatmap` {1=Mo…7=So: {0–23: Ø Gäste}}, `spitzenzeiten[]` (wochentag, stunde, gaeste), `hoechststand` (gaeste, zeitpunkt) |
+| `verweildauer` | `besuche`, `durchschnitt_minuten`, `median_minuten`, `nach_ankunftsstunde`, `nach_wochentag`, `nach_bereich`, `verteilung` (Besuche ab 5 Minuten) |
+| `stammgaeste` | `geraete`, `wiederkehrer`, `wiederkehrer_quote`, `abstand_tage_durchschnitt`, `abstand_verteilung`, `besuche_je_geraet` |
+| `aktionen_wirkung` | `vergleich_rueckkehr_quote_ohne_klick`, `zeitfenster_tage` (30), `aktionen[]` (id, titel, geraete_mit_klick, wiedergekommen, rueckkehr_quote, unterschied_prozentpunkte) |
+| `technik` | `geraetetypen` {iPhone: n, Android: n, …}, `datenverbrauch` (null, wenn die UDM keinen Verbrauch je Gerät meldet), `access_points[]` (name, bereich, modell, zustand, geraete, hoechststand, funk_wiederholungen_prozent, hinweise[]) |
+
+Datenschutz: Die Schnittstelle liefert nur Anzahlen und Durchschnitte, nie einzelne Geräte oder Kennungen.
+
 ## Empfohlene Umsetzung im Dashboard
 
 1. **Einstellungen**: Feld „Gäste-WLAN: Adresse“ und „Gäste-WLAN: Schlüssel“ (verschlüsselt, write-only) – keine `.env`-Variablen.
 2. **Restaurant-Zuordnung**: einmal `GET /standorte` und je Restaurant im Dashboard den `slug` speichern.
 3. **Auswertung**: Zeitplan stündlich `GET /auswertung?von=<heute>&bis=<heute>` und nachts den Vortag; Werte in einer eigenen Tabelle (`wlan_tageswerte`: restaurant, datum, anmeldungen, geraete, wiederkehrer, newsletter) ablegen. Seiten im Dashboard lesen nur diese Tabelle.
 4. **Marketingaktionen**: Eingabemaske im Dashboard (Felder wie oben, Bild-Upload). Beim Speichern `PUT /aktionen/{id}`, beim Löschen `DELETE`. Schlägt der Aufruf fehl, Hinweis zeigen und im Zeitplan erneut versuchen.
-5. **Systemstatus**: `GET /status` im Selbsttest des Dashboards.
+5. **Auslastung**: `GET /auslastung` alle 5 Minuten für eine Live-Kachel je Restaurant; `GET /netzwerk` nachts für den Vortag bzw. die letzten 30 Tage, Ergebnis als JSON je Restaurant ablegen.
+6. **Systemstatus**: `GET /status` im Selbsttest des Dashboards.
 
 ```php
 // Beispiel Laravel (Dashboard-Seite)

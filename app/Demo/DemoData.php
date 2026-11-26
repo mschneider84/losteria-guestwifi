@@ -41,6 +41,10 @@ class DemoData
         mt_srand(42);
         $rows = [];
         $devices = [];
+        $visits = [];
+        $seen = []; // Gerät => Anmeldezeiten (für Aktions-Klicks)
+        $types = ['iphone' => 46, 'android' => 38, 'ipad' => 5, 'windows' => 5, 'mac' => 4, 'sonstige' => 2];
+        $deviceType = [];
         foreach ($ids as $locId => $weight) {
             $devices[$locId] = [];
             for ($d = 59; $d >= 0; $d--) {
@@ -62,10 +66,15 @@ class DemoData
                         continue;
                     }
                     $r = mt_rand(1, 100);
+                    $deviceType[$hash] ??= self::pick($types);
+                    $seen[$locId][$hash][] = $at->toDateTimeString();
+                    if ($d <= 34) {
+                        $visits[] = self::visit($locId, $hash, $at, $deviceType[$hash]);
+                    }
                     $rows[] = [
                         'location_id' => $locId, 'device_hash' => $hash, 'language' => $r <= 72 ? 'de' : ($r <= 90 ? 'en' : 'it'),
                         'method' => mt_rand(1, 100) <= 14 ? 'email' : 'click', 'is_returning' => $returning, 'status' => 'authorized',
-                        'ssid' => 'Osteria-Gast', 'authorized_at' => $at, 'expires_at' => $at->copy()->addMinutes(240),
+                        'ssid' => 'Osteria-Gast', 'device_type' => $deviceType[$hash], 'authorized_at' => $at, 'expires_at' => $at->copy()->addMinutes(240),
                         'is_demo' => true, 'created_at' => $at, 'updated_at' => $at,
                     ];
                     if (count($rows) >= 500) {
@@ -78,6 +87,12 @@ class DemoData
         if ($rows) {
             DB::table('guest_sessions')->insert($rows);
         }
+
+        DB::table('client_visits')->where('is_demo', true)->delete();
+        foreach (array_chunk($visits, 500) as $chunk) {
+            DB::table('client_visits')->insert($chunk);
+        }
+        self::network($ids);
 
         if (! DB::table('newsletter_contacts')->where('is_demo', true)->exists()) {
             $first = ['anna', 'luca', 'marie', 'paul', 'giulia', 'felix', 'sofia', 'jonas', 'lea', 'marco', 'emma', 'noah', 'chiara', 'ben', 'mia'];
@@ -99,14 +114,15 @@ class DemoData
             DB::table('newsletter_contacts')->insert($contacts);
         }
 
-        self::promotions(array_keys($ids));
+        self::promotions(array_keys($ids), $seen);
 
         Cache::put('demo.stamp', $stamp, 86400);
     }
 
     /** Zwei erfundene Aktionen, wie sie das Dashboard schicken würde, samt Aufrufen und Klicks. */
-    private static function promotions(array $locationIds): void
+    private static function promotions(array $locationIds, array $seen): void
     {
+        DB::table('promotion_clicks')->where('is_demo', true)->delete();
         $items = [
             ['external_id' => 'demo-pizza-dezember', 'image' => 'aktion-pizza.jpg', 'priority' => 1, 'placement' => 'both',
                 'title' => ['de' => 'Pizza des Monats: Tartufo e Funghi', 'en' => 'Pizza of the month: Tartufo e Funghi', 'it' => 'Pizza del mese: Tartufo e Funghi'],
@@ -139,7 +155,109 @@ class DemoData
                 }
             }
             DB::table('promotion_stats')->insert($rows);
+
+            // Klicks einzelner Geräte; wer klickt, kommt in der Demo etwas häufiger wieder
+            $clicks = [];
+            foreach ($seen as $locId => $byHash) {
+                foreach ($byHash as $hash => $times) {
+                    foreach ($times as $i => $t) {
+                        if ($t < now()->subDays(20)->toDateTimeString() || mt_rand(1, 100) > 6) {
+                            continue;
+                        }
+                        $comesBack = isset($times[$i + 1]);
+                        if ($comesBack || mt_rand(1, 100) <= 45) {
+                            $clicks[] = ['promotion_id' => $promotion->id, 'location_id' => $locId, 'device_hash' => $hash,
+                                'clicked_at' => \Carbon\Carbon::parse($t)->addMinutes(mt_rand(1, 40)), 'is_demo' => true];
+                        }
+                        break;
+                    }
+                }
+            }
+            foreach (array_chunk($clicks, 500) as $chunk) {
+                DB::table('promotion_clicks')->insert($chunk);
+            }
         }
+    }
+
+    private const AREAS = ['Innen' => 55, 'Terrasse' => 25, 'Bar' => 20];
+
+    /** Ein Besuch zu einer Demo-Anmeldung: Mittags kürzer, abends länger, an der Bar am kürzesten. */
+    private static function visit(int $locId, string $hash, \Carbon\Carbon $at, string $type): array
+    {
+        $area = self::pick(self::AREAS);
+        $base = $at->hour < 15 ? 48 : ($at->hour < 18 ? 60 : 98);
+        $minutes = (int) max(6, round($base * ($area === 'Bar' ? 0.6 : ($area === 'Terrasse' ? 1.15 : 1)) * (0.55 + mt_rand(0, 90) / 100)));
+        $end = $at->copy()->addMinutes($minutes);
+        if ($end->isFuture()) {
+            $end = now();
+            $minutes = max(0, (int) $at->diffInMinutes($end));
+        }
+        $rx = (int) round($minutes * mt_rand(8, 45) / 10);
+
+        return ['location_id' => $locId, 'device_hash' => $hash, 'area' => $area, 'first_seen_at' => $at, 'last_seen_at' => $end,
+            'minutes' => $minutes, 'device_type' => $type, 'rx_mb' => $rx, 'tx_mb' => (int) round($rx * 0.12), 'is_demo' => true];
+    }
+
+    /** Access Points und Zählstände alle 15 Minuten (35 Tage bis heute Abend). */
+    private static function network(array $ids): void
+    {
+        DB::table('network_snapshots')->where('is_demo', true)->delete();
+        $aps = [
+            ['Gastraum vorne', 'Innen', 'U7 Pro'], ['Gastraum hinten', 'Innen', 'U7 Pro'],
+            ['Terrasse', 'Terrasse', 'U7 Outdoor'], ['Bar', 'Bar', 'U6+'],
+        ];
+        $hourCurve = [11 => 0.25, 12 => 0.75, 13 => 0.8, 14 => 0.45, 15 => 0.25, 16 => 0.25, 17 => 0.45, 18 => 0.8, 19 => 1.0, 20 => 0.95, 21 => 0.7, 22 => 0.4, 23 => 0.15];
+        $i = 0;
+        foreach ($ids as $locId => $weight) {
+            $i++;
+            $rows = [];
+            for ($t = now()->subDays(34)->startOfDay(); $t <= now()->endOfDay(); $t = $t->copy()->addMinutes(15)) {
+                $f = $hourCurve[$t->hour] ?? 0;
+                $day = $t->isWeekend() ? 1.35 : ($t->isFriday() ? 1.15 : 0.85);
+                $guests = (int) round(48 * $weight * $f * $day * (0.85 + mt_rand(0, 30) / 100));
+                $terrace = 0.22 + ($t->hour >= 12 && $t->hour <= 17 ? 0.1 : 0) + ($t->isWeekend() ? 0.05 : 0);
+                $bar = $t->hour >= 17 ? 0.24 : 0.1;
+                $split = ['Terrasse' => (int) round($guests * $terrace), 'Bar' => (int) round($guests * $bar)];
+                $split['Innen'] = max(0, $guests - $split['Terrasse'] - $split['Bar']);
+                $staff = $f > 0 ? 4 : 1;
+                $rows[] = ['location_id' => $locId, 'area' => 'gesamt', 'taken_at' => $t, 'clients' => $guests + $staff, 'guests' => $guests, 'is_demo' => true];
+                foreach ($split as $area => $n) {
+                    $rows[] = ['location_id' => $locId, 'area' => $area, 'taken_at' => $t, 'clients' => $n + ($area === 'Bar' ? $staff : 0), 'guests' => $n, 'is_demo' => true];
+                }
+                if (count($rows) >= 800) {
+                    DB::table('network_snapshots')->insert($rows);
+                    $rows = [];
+                }
+            }
+            if ($rows) {
+                DB::table('network_snapshots')->insert($rows);
+            }
+
+            $current = DB::table('network_snapshots')->where('location_id', $locId)->where('taken_at', '<=', now())->orderByDesc('taken_at')->limit(4)->get()->keyBy('area');
+            foreach ($aps as $k => [$name, $area, $model]) {
+                $share = $area === 'Innen' ? 0.5 : 1;
+                $clients = (int) round(($current[$area]->clients ?? 0) * $share);
+                $weak = $i === 3 && $area === 'Terrasse';
+                \App\Models\AccessPoint::updateOrCreate(['location_id' => $locId, 'unifi_id' => "demo-{$locId}-{$k}"], [
+                    'mac' => sprintf('02:00:00:00:%02x:%02x', $i, $k), 'name' => $name, 'model' => $model, 'area' => $area, 'state' => 'online',
+                    'clients' => $clients, 'guests' => $clients, 'peak_clients' => (int) round(48 * $weight * 1.35 * ($area === 'Innen' ? 0.32 : 0.35)),
+                    'retries_pct' => $weak ? 23.4 : round(3 + mt_rand(0, 70) / 10, 1), 'cpu_pct' => mt_rand(8, 30),
+                    'uptime_sec' => 86400 * mt_rand(3, 40), 'last_seen_at' => now(), 'is_demo' => true,
+                ]);
+            }
+        }
+    }
+
+    private static function pick(array $weights): string
+    {
+        $r = mt_rand(1, array_sum($weights));
+        foreach ($weights as $k => $w) {
+            if (($r -= $w) <= 0) {
+                return (string) $k;
+            }
+        }
+
+        return (string) array_key_first($weights);
     }
 
     /** Mittags- und Abendspitze wie im Restaurant. */

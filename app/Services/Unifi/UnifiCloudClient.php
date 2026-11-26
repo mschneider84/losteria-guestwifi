@@ -62,6 +62,83 @@ class UnifiCloudClient implements UnifiClient
         $this->request('post', "/sites/{$siteId}/clients/{$this->clientId($siteId, $mac)}/actions", ['action' => 'UNAUTHORIZE_GUEST_ACCESS']);
     }
 
+    /**
+     * Access Points und verbundene Geräte über die Network Integration API.
+     * Felder werden vorsichtig gelesen: Was die UDM nicht liefert, bleibt leer (null).
+     */
+    public function network(string $site): array
+    {
+        $siteId = $this->siteId($site);
+
+        $devices = collect($this->paged("/sites/{$siteId}/devices"))->map(function ($d) {
+            $features = array_map('strtolower', array_map('strval', (array) ($d['features'] ?? [])));
+            $isAp = in_array('accesspoint', $features, true) || ! empty($d['interfaces']['radios'] ?? null) || in_array('radios', array_map('strtolower', array_map('strval', (array) ($d['interfaces'] ?? []))), true);
+
+            return [
+                'id' => (string) ($d['id'] ?? ''), 'mac' => isset($d['macAddress']) ? strtolower($d['macAddress']) : null,
+                'name' => $d['name'] ?? null, 'model' => $d['model'] ?? null,
+                'online' => strtoupper((string) ($d['state'] ?? '')) === 'ONLINE', 'is_ap' => $isAp,
+                'retries_pct' => null, 'cpu_pct' => null, 'uptime_sec' => null,
+            ];
+        })->filter(fn ($d) => $d['id'] !== '')->values()->all();
+
+        // Kennzahlen je Access Point (höchstens 30 Aufrufe; Limit der Cloud: 100 je Minute und Konsole)
+        foreach ($devices as $i => $d) {
+            if (! $d['is_ap'] || ! $d['online'] || $i >= 30) {
+                continue;
+            }
+            try {
+                $st = $this->request('get', "/sites/{$siteId}/devices/{$d['id']}/statistics/latest")->json() ?? [];
+            } catch (UnifiException) {
+                continue;
+            }
+            $retries = collect($st['interfaces']['radios'] ?? [])->pluck('txRetriesPct')->filter(fn ($v) => is_numeric($v));
+            $devices[$i]['retries_pct'] = $retries->isNotEmpty() ? round((float) $retries->max(), 1) : null;
+            $devices[$i]['cpu_pct'] = is_numeric($st['cpuUtilizationPct'] ?? null) ? (float) $st['cpuUtilizationPct'] : null;
+            $devices[$i]['uptime_sec'] = is_numeric($st['uptimeSec'] ?? null) ? (int) $st['uptimeSec'] : null;
+        }
+
+        $clients = collect($this->paged("/sites/{$siteId}/clients"))->filter(fn ($c) => ! empty($c['macAddress']))->map(fn ($c) => [
+            'mac' => strtolower($c['macAddress']),
+            'ap_id' => $c['uplinkDeviceId'] ?? null,
+            'wireless' => strtoupper((string) ($c['type'] ?? 'WIRELESS')) === 'WIRELESS',
+            'guest' => strtoupper((string) ($c['access']['type'] ?? '')) === 'GUEST',
+            'rx_bytes' => self::bytes($c, ['rxBytes', 'statistics.rxBytes', 'traffic.rxBytes']),
+            'tx_bytes' => self::bytes($c, ['txBytes', 'statistics.txBytes', 'traffic.txBytes']),
+        ])->values()->all();
+
+        return ['devices' => $devices, 'clients' => $clients];
+    }
+
+    private static function bytes(array $c, array $paths): ?int
+    {
+        foreach ($paths as $p) {
+            $v = data_get($c, $p);
+            if (is_numeric($v)) {
+                return (int) $v;
+            }
+        }
+
+        return null;
+    }
+
+    /** Liste mit offset/limit vollständig abholen (höchstens 10 Seiten à 200). */
+    private function paged(string $path): array
+    {
+        $all = [];
+        for ($page = 0, $offset = 0; $page < 10; $page++) {
+            $json = $this->request('get', $path, ['offset' => $offset, 'limit' => 200])->json() ?? [];
+            $data = $json['data'] ?? [];
+            $all = array_merge($all, $data);
+            $offset += count($data);
+            if (! $data || $offset >= (int) ($json['totalCount'] ?? 0)) {
+                break;
+            }
+        }
+
+        return $all;
+    }
+
     public function sites(): array
     {
         return collect($this->allSites())->mapWithKeys(fn ($s) => [($s['internalReference'] ?? $s['id']) => $s['name'] ?? $s['id']])->all();

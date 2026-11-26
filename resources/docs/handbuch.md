@@ -9,6 +9,17 @@
 ## Übersicht
 Kennzahlen je Zeitraum (7, 14, 30, 90 Tage) und Standort: gerade online, Anmeldungen, Wiederkehrer, neue Newsletter-Kontakte. Darunter Anmeldungen pro Tag, Stoßzeiten und Sprachen.
 
+## Netzwerk
+Was im WLAN los ist, alle 5 Minuten aktualisiert:
+- **Jetzt gerade**: Gäste im WLAN je Restaurant und Bereich, Auslastung im Vergleich zum Höchststand der letzten 30 Tage.
+- **Wo sitzen die Gäste?**: Innen, Terrasse, Bar … im Tagesverlauf. Den Bereich gibst du jedem Access Point unten in der Tabelle.
+- **Auslastung**: Wochentag × Uhrzeit – je dunkler, desto voller.
+- **Verweildauer**: wie lange Gäste bleiben, nach Ankunftszeit, Bereich und Wochentag.
+- **Stammgäste**: wer wiederkommt und in welchem Abstand; dazu, ob Gäste nach einem Klick auf eine Aktion häufiger wiederkommen.
+- **Technik**: Gerätetypen, Datenverbrauch und Access Points mit Problemen (offline, viele Funk-Wiederholungen, überlastet).
+
+Geräte werden nur pseudonym gezählt; Besuche werden nach 90 Tagen gelöscht (einstellbar unter Einstellungen → Datenschutz).
+
 ## Standorte
 Jedes Restaurant hat eine eigene UniFi-Site, Farbe, Logo, Texte in drei Sprachen, Zeitlimit und Bandbreite. „Vorschau“ zeigt die Gästeseite, ohne etwas freizuschalten.
 

@@ -15,6 +15,7 @@
     <a href="{{ route('admin.dashboard') }}" class="logo"><span class="logo-dot"></span>{{ \App\Support\Brand::name() }}</a>
     <nav class="mainnav">
         @can('dashboard.view')<a href="{{ route('admin.dashboard') }}" @class(['active' => request()->routeIs('admin.dashboard')])>📊 {{ __('Übersicht') }}</a>@endcan
+        @can('dashboard.view')<a href="{{ route('admin.network') }}" @class(['active' => request()->routeIs('admin.network')])>📶 {{ __('Netzwerk') }}</a>@endcan
         @can('locations.manage')<a href="{{ route('admin.locations.index') }}" @class(['active' => request()->routeIs('admin.locations.*')])>📍 {{ __('Standorte') }}</a>@endcan
         @can('dashboard.view')<a href="{{ route('admin.promotions.index') }}" @class(['active' => request()->routeIs('admin.promotions.*')])>📣 {{ __('Aktionen') }}</a>@endcan
         @can('contacts.view')<a href="{{ route('admin.contacts.index') }}" @class(['active' => request()->routeIs('admin.contacts.*')])>✉️ {{ __('Newsletter') }}</a>@endcan
@@ -75,6 +76,7 @@
 </dialog>
 <nav class="tabbar">
     <a href="{{ route('admin.dashboard') }}">📊<span>{{ __('Übersicht') }}</span></a>
+    @can('dashboard.view')<a href="{{ route('admin.network') }}">📶<span>{{ __('Netzwerk') }}</span></a>@endcan
     @can('locations.manage')<a href="{{ route('admin.locations.index') }}">📍<span>{{ __('Standorte') }}</span></a>@endcan
     @can('contacts.view')<a href="{{ route('admin.contacts.index') }}">✉️<span>{{ __('Newsletter') }}</span></a>@endcan
     @can('status.view')<a href="{{ route('admin.status') }}">🩺<span>{{ __('Status') }}</span></a>@endcan

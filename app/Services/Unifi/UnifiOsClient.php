@@ -58,6 +58,31 @@ class UnifiOsClient implements UnifiClient
         $this->post("/proxy/network/api/s/{$site}/cmd/stamgr", ['cmd' => 'unauthorize-guest', 'mac' => strtolower($mac)]);
     }
 
+    public function network(string $site): array
+    {
+        $devices = collect($this->request('get', "/proxy/network/api/s/{$site}/stat/device")->json('data', []))->map(function ($d) {
+            $radios = collect($d['radio_table_stats'] ?? []);
+            $packets = $radios->sum('tx_packets');
+
+            return [
+                'id' => (string) ($d['_id'] ?? $d['mac'] ?? ''), 'mac' => $d['mac'] ?? null, 'name' => $d['name'] ?? null, 'model' => $d['model'] ?? null,
+                'online' => (int) ($d['state'] ?? 0) === 1, 'is_ap' => ($d['type'] ?? '') === 'uap',
+                'retries_pct' => $packets ? round($radios->sum('tx_retries') / $packets * 100, 1) : null,
+                'cpu_pct' => isset($d['system-stats']['cpu']) ? (float) $d['system-stats']['cpu'] : null,
+                'uptime_sec' => isset($d['uptime']) ? (int) $d['uptime'] : null,
+            ];
+        })->values();
+        $byMac = $devices->pluck('id', 'mac');
+
+        $clients = collect($this->request('get', "/proxy/network/api/s/{$site}/stat/sta")->json('data', []))->filter(fn ($c) => ! empty($c['mac']))->map(fn ($c) => [
+            'mac' => strtolower($c['mac']), 'ap_id' => isset($c['ap_mac']) ? ($byMac[$c['ap_mac']] ?? null) : null,
+            'wireless' => empty($c['is_wired']), 'guest' => ! empty($c['is_guest']),
+            'rx_bytes' => isset($c['rx_bytes']) ? (int) $c['rx_bytes'] : null, 'tx_bytes' => isset($c['tx_bytes']) ? (int) $c['tx_bytes'] : null,
+        ])->values();
+
+        return ['devices' => $devices->all(), 'clients' => $clients->all()];
+    }
+
     public function sites(): array
     {
         $data = $this->request('get', '/proxy/network/api/self/sites')->json('data', []);

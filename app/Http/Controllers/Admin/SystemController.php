@@ -33,6 +33,10 @@ class SystemController extends Controller
         $checks[] = ['name' => __('UniFi-Verbindung'), 'ok' => $unifi['ok'] ?? null,
             'detail' => $unifi ? (($unifi['ok'] ? __('erreichbar') : $unifi['error']).' · '.\Carbon\Carbon::parse($unifi['at'])->format('d.m. H:i'))
                 : (Settings::has('unifi.username') ? __('noch nicht geprüft') : __('Zugang fehlt in den Einstellungen'))];
+        $net = Cache::get('network.last_run');
+        $netErrors = collect($net['result'] ?? [])->filter(fn ($r) => str_starts_with($r, 'Fehler'));
+        $checks[] = ['name' => __('Netzwerk-Auswertung'), 'ok' => $net ? ($netErrors->isEmpty() && now()->diffInMinutes($net['at']) < 15) : null,
+            'detail' => $net ? __('zuletzt :t', ['t' => \Carbon\Carbon::parse($net['at'])->format('d.m.Y H:i')]).($netErrors->isNotEmpty() ? ' · '.$netErrors->keys()->implode(', ').': '.$netErrors->first() : '') : __('noch kein Lauf')];
         $checks[] = ['name' => __('Mail-Absender'), 'ok' => Settings::has('mail.from_address'),
             'detail' => Settings::get('mail.from_address') ?: __('nicht eingetragen')];
 

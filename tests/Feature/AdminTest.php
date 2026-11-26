@@ -29,7 +29,7 @@ class AdminTest extends TestCase
     public function test_all_pages_render_in_demo_mode(): void
     {
         $this->actingAs($this->admin())->post(route('admin.demo'))->assertRedirect();
-        foreach (['admin.dashboard', 'admin.locations.index', 'admin.locations.create', 'admin.contacts.index', 'admin.settings', 'admin.status', 'admin.users.index', 'admin.news', 'admin.meldungen.index'] as $route) {
+        foreach (['admin.dashboard', 'admin.locations.index', 'admin.locations.create', 'admin.contacts.index', 'admin.settings', 'admin.status', 'admin.users.index', 'admin.news', 'admin.meldungen.index', 'admin.network'] as $route) {
             $this->get(route($route))->assertOk();
         }
         $this->get(route('admin.dashboard', ['tage' => 90]))->assertOk()->assertSee('Osteria Centrale');

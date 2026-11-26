@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GuestSession;
 use App\Models\Location;
 use App\Models\NewsletterContact;
 use App\Models\Promotion;
 use App\Services\Portal\GuestAuthorizer;
+use App\Support\DeviceType;
 use App\Support\Settings;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -76,6 +79,7 @@ class PortalController extends Controller
         ], [], ['terms' => trans('portal.terms_short'), 'email' => trans('portal.email')]);
 
         $email = ($location->newsletter_enabled && ! empty($data['newsletter'])) ? $data['email'] : null;
+        $device['device_type'] = DeviceType::fromUserAgent($request->userAgent());
         $result = $authorizer->authorize($location, $device, $lang, $email, (string) $request->ip(), (bool) $device['demo']);
 
         if (! $result['ok']) {
@@ -122,6 +126,13 @@ class PortalController extends Controller
         $device = $request->session()->get("portal.{$location->id}");
         if (! ($device['demo'] ?? false)) {
             $promotion->count($location, 'clicks');
+            if (! empty($device['mac'])) {
+                // Für „Wirkung von Aktionen“: nur das pseudonyme Gerät, keine MAC
+                DB::table('promotion_clicks')->insert([
+                    'promotion_id' => $promotion->id, 'location_id' => $location->id,
+                    'device_hash' => GuestSession::hashDevice($device['mac']), 'clicked_at' => now(), 'is_demo' => false,
+                ]);
+            }
         }
 
         return redirect()->away($promotion->cta_url);

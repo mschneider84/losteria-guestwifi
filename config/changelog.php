@@ -2,6 +2,12 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.3.0', 'build' => 6, 'date' => '2026-11-27 00:45', 'type' => 'new', 'area' => 'Netzwerk', 'audience' => 'admin', 'source' => null, 'module' => 'network',
+        'text' => 'Neue Seite „Netzwerk“: Live-Auslastung je Restaurant und Bereich (Innen, Terrasse, Bar), wo die Gäste im Tagesverlauf sitzen, volle Zeiten nach Wochentag und Uhrzeit, Verweildauer, Stammgäste und Wirkung von Aktionen, Gerätetypen, Datenverbrauch und schwache Access Points. Daten kommen alle 5 Minuten über die UniFi-Cloud, Geräte werden nur pseudonym gezählt.',
+        'text_en' => 'New “Network” page: live occupancy per restaurant and area (inside, terrace, bar), where guests sit throughout the day, busy times by weekday and hour, dwell time, regulars and campaign effect, device types, data usage and weak access points. Data comes every 5 minutes via the UniFi cloud; devices are only counted pseudonymously.'],
+    ['version' => '1.3.0', 'build' => 6, 'date' => '2026-11-27 00:45', 'type' => 'new', 'area' => 'Schnittstelle', 'audience' => 'admin', 'source' => null, 'module' => 'api',
+        'text' => 'Das L\'Osteria Dashboard kann jetzt auch die Live-Auslastung und die Netzwerk-Auswertungen abholen (nur Anzahlen und Durchschnitte).',
+        'text_en' => 'The L\'Osteria dashboard can now also fetch live occupancy and the network analytics (counts and averages only).'],
     ['version' => '1.2.1', 'build' => 5, 'date' => '2026-11-27 00:28', 'type' => 'fix', 'area' => 'System', 'audience' => 'admin', 'source' => null, 'module' => 'system',
         'text' => 'Bilder (Logos, Aktionen) werden im Speicher von Laravel Cloud abgelegt – der Deploy mit angehängtem Bucket klappt jetzt.',
         'text_en' => 'Images (logos, campaigns) are stored in the Laravel Cloud bucket – deploying with an attached bucket works now.'],

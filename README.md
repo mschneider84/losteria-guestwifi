@@ -71,8 +71,15 @@ Vor der Freischaltung dürfen Gäste nur das Portal erreichen. Unter **Hotspot �
 
 **Standorte → Standort anlegen**: Name, **UniFi-Site** (Kurzname aus der Adresse `/network/<site>/…`, bei nur einer Site `default`), Zeitlimit, Bandbreite, Farbe, Logo, Weiterleitung. Mit **Vorschau** lässt sich die Gästeseite ohne Freischaltung ansehen.
 
+### 5. Netzwerk-Auswertungen
+
+Laufen automatisch über denselben Cloud-Zugang: Der Zeitplan (`portal:network`) holt alle 5 Minuten je Standort die Access Points und die verbundenen Geräte. Unter **Netzwerk → Access Points** jedem AP einen Bereich geben (Innen, Terrasse, Bar …). Pro Lauf etwa 3 Aufrufe plus einer je Access Point – weit unter dem Limit von 100 je Minute und Konsole.
+
+Gezählt werden nur Geräte im Gäste-WLAN, gespeichert nur pseudonym (HMAC statt MAC). Gerätetypen kommen grob aus dem Browser der Gästeseite. Datenverbrauch je Gerät erscheint nur, wenn die UDM ihn über die Integration-API meldet.
+
 ### Vor dem Pilot zu klären
 
 - **Feste IPv4 für das External Portal**: UniFi erwartet beim *External Portal Server* je nach Version eine IP-Adresse statt eines Domainnamens. Laravel Cloud hat keine feste IP. Lösung, falls nötig: eine kleine Weiterleitung auf einem Server mit fester IP, die `/guest/s/…` samt Parametern an die Portal-Domain weiterreicht.
 - **Erster echter Test über die Cloud**: Der Weg über `api.ui.com` ist nach Ubiquitis Dokumentation vorgesehen, aber erst mit eurer UDM SE wirklich bestätigt. Beim Pilot eine Anmeldung durchspielen; schlägt sie fehl, zeigt der Systemstatus die Fehlernummer und den Grund.
+- **Netzwerk-Daten mit echter UDM prüfen**: Welche Felder die Integration-API je Gerät liefert (Access Point, Verbrauch, Funkwerte), ist versionsabhängig. Die Auswertung liest sie vorsichtig; fehlende Werte bleiben leer. Nach dem ersten Tag unter **Netzwerk** ansehen. In die Datenschutzerklärung aufnehmen: pseudonyme Zählung der Geräte im Gäste-WLAN (Auslastung, Verweildauer), Löschung nach 90 Tagen.
 - Rechtstexte: Links zu Nutzungsbedingungen, Datenschutzerklärung und Impressum unter **Einstellungen → Gästeseite** eintragen (bis dahin wird ein kurzer eingebauter Text gezeigt).

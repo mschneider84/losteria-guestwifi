@@ -11,6 +11,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/standorte', [DashboardApiController::class, 'locations']);
         Route::get('/auswertung', [DashboardApiController::class, 'stats']);
         Route::get('/aktionen', [DashboardApiController::class, 'promotions']);
+        Route::get('/auslastung', [DashboardApiController::class, 'occupancy']);
+        Route::get('/netzwerk', [DashboardApiController::class, 'network']);
     });
     Route::middleware(ApiKeyAuth::class.':write')->group(function () {
         Route::put('/aktionen/{id}', [DashboardApiController::class, 'upsertPromotion']);

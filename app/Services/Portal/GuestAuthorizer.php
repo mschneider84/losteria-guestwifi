@@ -33,6 +33,7 @@ class GuestAuthorizer
             'device_hash' => $hash,
             'ap_mac' => $device['ap'] ?? null,
             'ssid' => $device['ssid'] ?? null,
+            'device_type' => $device['device_type'] ?? null,
             'language' => $lang,
             'method' => $newsletterEmail ? 'email' : 'click',
             'is_returning' => $returning,
