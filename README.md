@@ -15,6 +15,8 @@ Laravel 13, PHP 8.3, MySQL 8.4 (lokal SQLite), Blade + eigenes CSS ohne Build-Sc
 
 Umgebungsvariablen: nur die, die Laravel Cloud selbst setzt (`APP_KEY`, Datenbank, Cache, `APP_ENV`, `APP_URL`). Alles andere – UniFi-Zugang, Mail, Löschfristen, Branding – steht in der Datenbank und wird unter **Einstellungen** gepflegt. Geheimnisse sind mit dem `APP_KEY` verschlüsselt: **den `APP_KEY` nie wechseln.**
 
+Eigene Domain (bei L'Osteria `guest.losteria.at`): in Laravel Cloud unter *Domains* hinzufügen, DNS-Eintrag laut Cloud setzen und `APP_URL=https://guest.losteria.at` eintragen. Daraus entstehen die Links in den Newsletter-Mails und die Angaben in der UDM-Anleitung unter **Standorte**.
+
 ```bash
 composer install
 cp .env.example .env && php artisan key:generate
@@ -70,7 +72,7 @@ Weil jede UDM die Site meist „default“ meldet, erkennt die Gästeseite das R
 
 Vor der Freischaltung dürfen Gäste nur das Portal erreichen. Unter **Hotspot → Pre-Authorization Allowances** eintragen:
 
-- Domain des Portals (z. B. `wlan.example.de`) bzw. dessen IP-Adresse
+- Domain des Portals (bei L'Osteria `guest.losteria.at`)
 - ggf. Domains für Schriften/Bilder, falls später externe Inhalte eingebunden werden (aktuell nicht nötig – alles wird vom Portal selbst geliefert)
 
 ### 4. Standort im Portal anlegen

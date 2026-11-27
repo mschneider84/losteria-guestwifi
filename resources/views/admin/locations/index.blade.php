@@ -6,11 +6,14 @@
     <a href="{{ route('admin.locations.create') }}" class="btn">＋ {{ __('Standort anlegen') }}</a>
 </div>
 @php
-    $portalHost = request()->getHost();
+    // Öffentliche Portal-Adresse aus APP_URL (z. B. guest.losteria.at), sonst die aktuelle
+    $appHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+    $portalHost = ($appHost && ! in_array($appHost, ['localhost', '127.0.0.1'], true)) ? $appHost : request()->getHost();
     $portalIp = \Illuminate\Support\Facades\Cache::remember('portal.ip.'.$portalHost, 3600, fn () => (($ip = gethostbyname($portalHost)) !== $portalHost) ? $ip : null);
 @endphp
 <details class="panel udm-guide" @if($locations->isEmpty()) open @endif>
     <summary><strong>📡 {{ __('So stellst du die UDM eines Restaurants ein') }}</strong></summary>
+    @if($portalHost !== request()->getHost())<p class="flash warn small">{{ __('Du bist gerade über :a angemeldet, die Gäste kommen über :b. Die Anleitung nutzt :b.', ['a' => request()->getHost(), 'b' => $portalHost]) }}</p>@endif
     <p class="muted small">{{ __('In UniFi Network der jeweiligen UDM (z. B. AT_WOERGL_UDM_01). Die Texte im „Landing Page Designer“ von UniFi werden nicht gebraucht – Gäste sehen die Seite aus diesem Portal.') }}</p>
     <ol class="steps">
         <li>{{ __('Hotspot → Authentication: alle Haken bei Password, Payment, Vouchers, RADIUS raus. Unter „One Way Methods“ „External Portal Server“ anhaken.') }}</li>
