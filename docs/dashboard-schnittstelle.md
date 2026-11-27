@@ -155,3 +155,42 @@ $wlan = Http::withToken(Settings::get('wlan.api_key'))
 $daten = $wlan->get('/auswertung', ['von' => today()->toDateString(), 'bis' => today()->toDateString()])->throw()->json();
 $wlan->put('/aktionen/'.$aktion->id, $aktion->toWlanPayload())->throw();
 ```
+
+## Anmeldung über das Dashboard (Single Sign-on)
+
+Das Gäste-WLAN hat keine eigene Benutzerverwaltung. Benutzer öffnen die Verwaltung im Dashboard über den Knopf **„Gäste-WLAN öffnen“**; Name und Rolle kommen bei jeder Anmeldung aus dem Dashboard.
+
+**Einrichtung:** Im Portal unter *Einstellungen → Dashboard-Schnittstelle → Anmeldung über das Dashboard* auf „Schlüssel erzeugen“ klicken. Der Schlüssel (`sso_…`) wird einmal angezeigt; im Dashboard verschlüsselt als Einstellung speichern (z. B. `gaestewlan.sso_secret`). Ab dann ist der Passwort-Login im Portal nur noch Notfall-Zugang für Superadmins.
+
+**Ablauf:** Knopf → Dashboard-Route (nur für angemeldete Benutzer mit Recht aufs Gäste-WLAN) erzeugt einen Token und leitet weiter auf
+`GET https://<portal-domain>/sso?token=<JWT>` (alternativ `POST /sso` mit Feld `token`).
+
+**Token:** JWT, `alg` = `HS256`, signiert mit dem gemeinsamen Schlüssel. Pro Klick neu erzeugen, nie speichern oder loggen.
+
+| Claim | Pflicht | Inhalt |
+|---|---|---|
+| `iss` | ja | `losteria-dashboard` |
+| `aud` | ja | `losteria-guestwifi` |
+| `sub` | ja | feste Benutzer-ID im Dashboard (Text, max. 120) |
+| `email` | ja | E-Mail des Benutzers |
+| `name` | ja | Anzeigename |
+| `role` | ja | Rolle im Gäste-WLAN: `superadmin`, `admin`, `manager` (Restaurantleitung), `viewer` (Leser) |
+| `iat` / `exp` | ja | Unix-Zeit; Gültigkeit **60 Sekunden** empfohlen, höchstens 300 |
+| `jti` | ja | Zufallswert, mind. 16 Zeichen; jeder Token gilt nur einmal |
+| `redirect` | nein | Zielseite im Portal, nur Pfade unter `/admin`, z. B. `/admin/netzwerk` |
+
+Rollen im Portal: `superadmin` alles · `admin` alles außer Benutzer · `manager` Übersicht, Kontakte, Demo · `viewer` nur Übersicht. Benutzer ohne Gäste-WLAN-Recht bekommen im Dashboard keinen Knopf (kein Token). Im Portal gesperrte Benutzer kommen auch per Token nicht mehr hinein.
+
+Beispiel (PHP, ohne Bibliothek):
+
+```php
+$b64 = fn ($s) => rtrim(strtr(base64_encode($s), '+/', '-_'), '=');
+$h = $b64(json_encode(['alg' => 'HS256', 'typ' => 'JWT']));
+$p = $b64(json_encode(['iss' => 'losteria-dashboard', 'aud' => 'losteria-guestwifi', 'sub' => (string) $user->id,
+    'email' => $user->email, 'name' => $user->name, 'role' => $rolle, 'iat' => time(), 'exp' => time() + 60,
+    'jti' => Str::random(32)]));
+$token = "$h.$p.".$b64(hash_hmac('sha256', "$h.$p", $secret, true));
+return redirect()->away('https://guest.losteria.at/sso?token='.$token);
+```
+
+Fehler (abgelaufen, falsche Signatur, schon benutzt, unbekannte Rolle) führen auf die Anmeldeseite des Portals mit dem Hinweis, im Dashboard noch einmal zu klicken.

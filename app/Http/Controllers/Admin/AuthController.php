@@ -41,6 +41,14 @@ class AuthController extends Controller
             return back()->withInput(['email' => $data['email']])->withErrors(['email' => __('E-Mail oder Passwort stimmt nicht.')]);
         }
 
+        // Bei Anmeldung über das Dashboard: Passwort nur noch als Notfall-Zugang für Superadmins
+        if (\App\Support\DashboardSso::active() && $request->user()->role !== 'superadmin') {
+            Auth::logout();
+            Activity::log('login.sso_only', $data['email']);
+
+            return back()->withErrors(['email' => __('Bitte über das L\'Osteria Dashboard anmelden.')]);
+        }
+
         RateLimiter::clear($accountKey);
         $request->session()->regenerate();
         $request->user()->forceFill(['last_login_at' => now()])->save();

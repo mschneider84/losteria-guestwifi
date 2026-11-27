@@ -31,6 +31,7 @@ Route::get('/wlan/{location:slug}/aktion/{promotion}', [PortalController::class,
 Route::get('/', fn () => redirect()->route('admin.dashboard'));
 Route::get('/anmelden', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/anmelden', [AuthController::class, 'login'])->middleware('throttle:10,1');
+Route::match(['get', 'post'], '/sso', [\App\Http\Controllers\Admin\SsoController::class, 'login'])->middleware('throttle:30,1')->name('sso.login');
 Route::get('/setup', [AuthController::class, 'showSetup'])->name('setup');
 Route::post('/setup', [AuthController::class, 'setup']);
 
@@ -65,6 +66,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminLocale::class])->prefix('ad
         Route::get('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'keys'])->name('api-keys.index');
         Route::post('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'storeKey'])->name('api-keys.store');
         Route::delete('/einstellungen/schnittstelle/{key}', [\App\Http\Controllers\Admin\IntegrationController::class, 'destroyKey'])->name('api-keys.destroy');
+        Route::put('/einstellungen/schnittstelle/anmeldung', [\App\Http\Controllers\Admin\IntegrationController::class, 'updateSso'])->name('sso.update');
         Route::post('/einstellungen/unifi-konsolen', [SettingsController::class, 'loadConsoles'])->name('settings.unifi-consoles');
         Route::post('/einstellungen/unifi-test', [SettingsController::class, 'testUnifi'])->name('settings.unifi-test');
     });

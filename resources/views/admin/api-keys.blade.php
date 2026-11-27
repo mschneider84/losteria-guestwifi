@@ -47,4 +47,27 @@
     <p class="muted small mt">{{ __('Die genaue Beschreibung der Schnittstelle steht im Repository unter docs/dashboard-schnittstelle.md.') }}</p>
 </section>
 </div>
+
+<section class="panel mt" id="sso">
+    <h2>🔑 {{ __('Anmeldung über das Dashboard') }}</h2>
+    <p class="muted">{{ __('Das Gäste-WLAN hat keine eigene Benutzerverwaltung mehr: Wer im L\'Osteria Dashboard angemeldet ist, öffnet die Verwaltung dort über „Gäste-WLAN öffnen“. Name und Rolle kommen aus dem Dashboard. Der Passwort-Login bleibt nur als Notfall-Zugang für Superadmins, falls das Dashboard nicht erreichbar ist.') }}</p>
+    @if(session('new_sso_secret'))
+        <div class="keybox">
+            <strong>{{ __('Gemeinsamer Schlüssel – jetzt kopieren und im Dashboard eintragen:') }}</strong>
+            <code class="key">{{ session('new_sso_secret') }}</code>
+            <p class="muted small">{{ __('Er wird nur jetzt angezeigt und verschlüsselt gespeichert.') }}</p>
+        </div>
+    @endif
+    <p>{{ __('Status:') }} @if($ssoActive)<span class="pill okpill">✓ {{ __('aktiv') }}</span> @if($ssoLast)<span class="muted small">{{ __('letzte Anmeldung über das Dashboard: :t', ['t' => \Carbon\Carbon::parse($ssoLast)->timezone('Europe/Berlin')->format('d.m.Y H:i')]) }}</span>@endif @else<span class="pill">{{ __('aus – Passwort-Login') }}</span>@endif</p>
+    <form method="post" action="{{ route('admin.sso.update') }}" class="stack">
+        @csrf @method('PUT')
+        <label>{{ __('Adresse des Dashboards (dorthin führt der Knopf auf der Anmeldeseite)') }}<input type="url" name="dashboard_url" value="{{ old('dashboard_url', $ssoUrl) }}" placeholder="https://dashboard.losteria.at"></label>
+        <p class="muted small">{{ __('Einstiegsadresse für das Dashboard:') }} <code>{{ route('sso.login') }}?token=…</code></p>
+        <div class="row">
+            <button class="btn" name="action" value="save">{{ __('Speichern') }}</button>
+            <button class="btn ghost" name="action" value="generate" @if($ssoActive) onclick="return confirm('{{ __('Neuen Schlüssel erzeugen? Der alte gilt dann nicht mehr, bis er im Dashboard ersetzt ist.') }}')" @endif>🔑 {{ $ssoActive ? __('Neuen Schlüssel erzeugen') : __('Schlüssel erzeugen und aktivieren') }}</button>
+            @if($ssoActive)<button class="btn ghost" name="action" value="disable" onclick="return confirm('{{ __('Wieder auf Passwort-Login umstellen?') }}')">{{ __('Abschalten') }}</button>@endif
+        </div>
+    </form>
+</section>
 @endsection

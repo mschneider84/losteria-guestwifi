@@ -17,7 +17,12 @@ class IntegrationController extends Controller
     /** Einstellungen → Dashboard-Schnittstelle: Schlüssel verwalten */
     public function keys(): View
     {
-        return view('admin.api-keys', ['keys' => ApiKey::latest()->get()]);
+        return view('admin.api-keys', [
+            'keys' => ApiKey::latest()->get(),
+            'ssoActive' => \App\Support\DashboardSso::active(),
+            'ssoUrl' => \App\Support\DashboardSso::dashboardUrl(),
+            'ssoLast' => \App\Models\User::whereNotNull('sso_sub')->max('last_login_at'),
+        ]);
     }
 
     public function storeKey(Request $request): RedirectResponse
@@ -28,6 +33,27 @@ class IntegrationController extends Controller
         Activity::log('api_key.created', $key->name, ['write' => $key->can_write]);
 
         return back()->with('new_key', $plain)->with('ok', __('Schlüssel angelegt. Er wird nur jetzt einmal angezeigt.'));
+    }
+
+    /** Anmeldung über das Dashboard: Adresse speichern, Schlüssel erzeugen (nur einmal sichtbar) oder abschalten. */
+    public function updateSso(Request $request): RedirectResponse
+    {
+        $data = $request->validate(['dashboard_url' => 'nullable|url:https|max:255', 'action' => 'nullable|in:save,generate,disable']);
+        \App\Support\Settings::set('sso.dashboard_url', $data['dashboard_url'] ?? null);
+        if (($data['action'] ?? null) === 'generate') {
+            $secret = \App\Support\DashboardSso::generateSecret();
+            Activity::log('sso.secret_generated');
+
+            return back()->with('new_sso_secret', $secret)->with('ok', __('Neuer Schlüssel erzeugt – jetzt im Dashboard eintragen. Ab sofort meldet ihr euch über das Dashboard an.'));
+        }
+        if (($data['action'] ?? null) === 'disable') {
+            \App\Support\Settings::set('sso.secret', null);
+            Activity::log('sso.disabled');
+
+            return back()->with('ok', __('Anmeldung über das Dashboard abgeschaltet. Es gilt wieder der Passwort-Login.'));
+        }
+
+        return back()->with('ok', __('Gespeichert.'));
     }
 
     public function destroyKey(ApiKey $key): RedirectResponse

@@ -16,11 +16,12 @@ class UserController extends Controller
 {
     public function index(): View
     {
-        return view('admin.users', ['users' => User::orderBy('name')->get(), 'roles' => Permissions::ROLES, 'perms' => Permissions::ALL]);
+        return view('admin.users', ['users' => User::orderBy('name')->get(), 'roles' => Permissions::ROLES, 'perms' => Permissions::ALL, 'sso' => \App\Support\DashboardSso::active()]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        abort_if(\App\Support\DashboardSso::active(), 403, __('Benutzer kommen aus dem L\'Osteria Dashboard.'));
         $data = $request->validate([
             'name' => 'required|max:100',
             'email' => 'required|email|unique:users,email',
@@ -36,9 +37,11 @@ class UserController extends Controller
     public function update(Request $request, User $user): RedirectResponse
     {
         $data = $request->validate([
-            'role' => ['required', Rule::in($this->assignableRoles($request->user()))],
+            'role' => ['nullable', Rule::in($this->assignableRoles($request->user()))],
             'active' => 'boolean',
         ]);
+        // Rolle von Dashboard-Benutzern kommt aus dem Dashboard; hier nur sperren/entsperren
+        $data['role'] = ($user->sso_sub && \App\Support\DashboardSso::active()) ? $user->role : ($data['role'] ?? $user->role);
         abort_if($user->id === $request->user()->id, 422, __('Du kannst deine eigene Rolle nicht ändern.'));
         if ($user->role === 'superadmin' && ($data['role'] !== 'superadmin' || ! $request->boolean('active'))
             && User::where('role', 'superadmin')->where('active', true)->count() <= 1) {

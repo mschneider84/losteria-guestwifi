@@ -39,6 +39,7 @@ class Settings
         'modules.newsletter' => ['portal', 'Newsletter-Modul (Anmeldung auf der Gästeseite, Kontakte, Bestätigungs-Mails)', 'bool', false, false],
         'portal.terms_url' => ['portal', 'Externer Link Nutzungsbedingungen & Datenschutz (nur wenn unter „Gästeseite & Rechtstexte“ kein Text steht)', 'url', '', false],
         'portal.imprint_url' => ['portal', 'Externer Link Impressum (optional)', 'url', '', false],
+        'sso.secret' => ['sso', 'Gemeinsamer Schlüssel für die Anmeldung über das Dashboard', 'password', '', true],
         'brand.name' => ['brand', 'Name', 'text', "L'Osteria Gäste-WLAN", false],
         'brand.company' => ['brand', 'Firma (Copyright)', 'text', "L'Osteria", false],
         'brand.color' => ['brand', 'Markenfarbe', 'color', '#db052c', false],
