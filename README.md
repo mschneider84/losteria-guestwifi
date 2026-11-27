@@ -53,6 +53,12 @@ Grenzen des Connectors: 100 Anfragen pro Minute je Konsole (je Gast-Anmeldung 3 
 
 Alternative „Direkt“ (nur mit VPN oder Freigabe): lokaler Benutzer auf der UDM (Admins & Users → *Restrict to Local Access Only*, Network: Site Admin), Adresse/Benutzer/Passwort eintragen.
 
+### 1b. Eine UDM je Restaurant
+
+Jeder Standort bekommt unter **Standorte → Bearbeiten → UniFi-Konsole** seine eigene UDM SE. Ein API-Schlüssel für das UI-Konto reicht für alle Konsolen, die diesem Konto **gehören**. Ist eine Konsole nur als Admin geteilt (Liste zeigt „nur Admin-Zugriff“), lehnt die Cloud mit 403 „insufficient permissions for this host“ ab. Abhilfe: Eigentum der Konsole auf das Konto übertragen (unifi.ui.com → Konsole → Einstellungen → Owner) oder beim Standort einen eigenen Schlüssel des Eigentümer-Kontos hinterlegen.
+
+Weil jede UDM die Site meist „default“ meldet, erkennt die Gästeseite das Restaurant am Access Point (aus den Netzwerk-Daten), an der öffentlichen IP der UDM oder – falls beides nicht klappt – lässt den Gast einmal wählen.
+
 ### 2. Gästenetz auf „External Portal“ stellen
 
 1. **Settings → WiFi**: SSID für Gäste (z. B. `Osteria-Gast`) mit einem eigenen Gast-Netzwerk/VLAN; **Hotspot Portal** aktivieren.

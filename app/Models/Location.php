@@ -10,6 +10,8 @@ class Location extends Model
 {
     protected $guarded = ['id'];
 
+    protected $hidden = ['unifi_api_key'];
+
     protected function casts(): array
     {
         return [
@@ -19,6 +21,7 @@ class Location extends Model
             'newsletter_enabled' => 'boolean',
             'active' => 'boolean',
             'is_demo' => 'boolean',
+            'unifi_api_key' => 'encrypted',
         ];
     }
 

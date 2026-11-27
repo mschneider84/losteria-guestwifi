@@ -53,7 +53,7 @@ class NetworkCollector
     /** @return array{clients:int, guests:int} */
     public function collect(Location $location, ?array $net = null): array
     {
-        $net ??= $this->unifi->client(false)->network($location->unifi_site);
+        $net ??= $this->unifi->forLocation($location)->network($location->unifi_site);
         $now = now();
 
         // Gastgeräte: Gast-Netz laut UniFi oder in den letzten 24 h über das Portal freigeschaltet

@@ -26,7 +26,10 @@ class PortalController extends Controller
 
     public function landing(Request $request, string $site): View|RedirectResponse
     {
-        $location = Location::mode(false)->where('unifi_site', $site)->where('active', true)->firstOrFail();
+        $location = $this->resolveLocation($request, $site);
+        if (! $location instanceof Location) {
+            return $location; // Auswahl, falls das Restaurant nicht eindeutig erkannt wurde
+        }
 
         $mac = (string) $request->query('id', '');
         if (! preg_match(self::MAC, $mac)) {
@@ -42,6 +45,42 @@ class PortalController extends Controller
         ]);
 
         return redirect()->route('portal.show', ['location' => $location->slug, 'lang' => $request->query('lang')]);
+    }
+
+    /**
+     * Welches Restaurant? Jede UDM schickt meist die Site „default“. Reihenfolge:
+     * ausdrücklich gewählt (?standort=) → einziger Standort mit dieser Site → Access Point (ap=) → öffentliche IP der UDM.
+     */
+    private function resolveLocation(Request $request, string $site): Location|View
+    {
+        $candidates = Location::mode(false)->where('unifi_site', $site)->where('active', true)->orderBy('name')->get();
+        if ($slug = $request->query('standort')) {
+            $chosen = $candidates->firstWhere('slug', $slug);
+            if ($chosen) {
+                return $chosen;
+            }
+        }
+        if ($candidates->count() === 1) {
+            return $candidates->first();
+        }
+        abort_if($candidates->isEmpty(), 404);
+
+        $ap = strtolower(str_replace('-', ':', (string) $request->query('ap')));
+        if (preg_match(self::MAC, $ap)) {
+            $byAp = \App\Models\AccessPoint::where('mac', $ap)->whereIn('location_id', $candidates->pluck('id'))->value('location_id');
+            if ($byAp) {
+                return $candidates->firstWhere('id', $byAp);
+            }
+        }
+        $byIp = $candidates->where('unifi_wan_ip', $request->ip());
+        if ($byIp->count() === 1) {
+            return $byIp->first();
+        }
+
+        $lang = $this->lang($request);
+        app()->setLocale($lang);
+
+        return view('portal.choose', ['locations' => $candidates, 'query' => $request->query(), 'site' => $site, 'lang' => $lang, 'location' => null]);
     }
 
     /** Vorschau ohne echte UDM: es wird nichts freigeschaltet. */

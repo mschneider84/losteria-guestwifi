@@ -14,12 +14,34 @@
     </section>
     <section class="panel">
         <h2>📡 {{ __('UniFi') }}</h2>
+        @php($consoleId = old('unifi_console_id', $location->unifi_console_id))
+        <label>{{ __('UniFi-Konsole (UDM SE dieses Restaurants)') }}
+            @if($consoles)
+                <select name="unifi_console_id">
+                    <option value="">{{ __('– Standard aus den Einstellungen –') }}</option>
+                    @foreach($consoles as $id => $text)<option value="{{ $id }}" @selected($consoleId === $id)>{{ $text }}</option>@endforeach
+                    @if($consoleId && ! isset($consoles[$consoleId]))<option value="{{ $consoleId }}" selected>{{ $consoleId }}</option>@endif
+                </select>
+            @else
+                <input name="unifi_console_id" value="{{ $consoleId }}" placeholder="{{ __('Konsolen-ID – oder erst unter Einstellungen den API-Schlüssel speichern') }}">
+            @endif
+        </label>
+        @if($location->unifi_wan_ip)<p class="muted small">{{ __('Öffentliche IP der UDM: :ip – darüber erkennt die Gästeseite das Restaurant.', ['ip' => $location->unifi_wan_ip]) }}</p>@endif
+        <details class="small">
+            <summary>{{ __('Eigener API-Schlüssel für diese Konsole (optional)') }}</summary>
+            <p class="muted">{{ __('Nur nötig, wenn diese UDM einem anderen UI-Konto gehört. Über die Cloud klappt es nur mit einem Schlüssel des Kontos, dem die Konsole gehört (Owner).') }}</p>
+            <input type="password" name="unifi_api_key" autocomplete="new-password" placeholder="{{ $location->unifi_api_key ? '•••••••• '.__('(gespeichert – leer lassen, um es zu behalten)') : __('leer = Schlüssel aus den Einstellungen') }}">
+            @if($location->unifi_api_key)<label class="inline"><input type="checkbox" name="unifi_api_key_remove" value="1"> {{ __('Eigenen Schlüssel entfernen') }}</label>@endif
+        </details>
         <label>{{ __('UniFi-Site') }} <i class="tip" title="{{ __('Kurzname der Site in der UDM, steht in der Adresse /network/<site>/… – bei nur einer Site „default“.') }}">ⓘ</i><input name="unifi_site" value="{{ old('unifi_site', $location->unifi_site) }}" required></label>
         <label>{{ __('Zeitlimit (Minuten)') }}<input type="number" name="session_minutes" value="{{ old('session_minutes', $location->session_minutes) }}" min="15" max="1440" required></label>
         <div class="two">
             <label>{{ __('Download (kbit/s)') }}<input type="number" name="down_kbps" value="{{ old('down_kbps', $location->down_kbps) }}" placeholder="{{ __('unbegrenzt') }}"></label>
             <label>{{ __('Upload (kbit/s)') }}<input type="number" name="up_kbps" value="{{ old('up_kbps', $location->up_kbps) }}" placeholder="{{ __('unbegrenzt') }}"></label>
         </div>
+        @if($location->exists)
+            <p><button class="btn ghost" formaction="{{ route('admin.locations.test', $location) }}" formmethod="post" name="_method" value="POST" formnovalidate>🔌 {{ __('Verbindung testen') }}</button> <span class="muted small">{{ __('(vorher speichern)') }}</span></p>
+        @endif
         <label>{{ __('Datenvolumen (MB)') }}<input type="number" name="quota_mb" value="{{ old('quota_mb', $location->quota_mb) }}" placeholder="{{ __('unbegrenzt') }}"></label>
     </section>
     <section class="panel">

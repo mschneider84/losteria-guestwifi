@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Unifi\UnifiManager;
 use App\Support\Activity;
 use App\Support\Settings;
+use App\Support\UnifiConsoles;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -25,40 +26,33 @@ class SettingsController extends Controller
 
     public function index(): View
     {
-        // Schlüssel da, aber noch keine Konsole gewählt: Konsolen gleich abholen, damit die Auswahl erscheint
-        $consoleError = Cache::get('unifi.consoles.error');
-        if (! Cache::has('unifi.consoles') && ! $consoleError && $this->needsConsole()) {
+        // Schlüssel da, Konsolen noch nicht geladen: gleich abholen, damit die Auswahl erscheint
+        $consoleError = UnifiConsoles::error();
+        if (! $consoleError && ! UnifiConsoles::all() && $this->cloudKeySet()) {
             $consoleError = $this->refreshConsoles();
         }
 
         return view('admin.settings', [
             'groups' => self::GROUPS, 'fields' => Settings::FIELDS,
-            'consoles' => Cache::get('unifi.consoles', []), 'consoleError' => $consoleError,
+            'consoles' => UnifiConsoles::labels(), 'consoleError' => $consoleError,
         ]);
     }
 
-    private function needsConsole(): bool
+    private function cloudKeySet(): bool
     {
-        return Settings::get('unifi.mode') !== 'local' && Settings::has('unifi.cloud_api_key') && ! Settings::has('unifi.console_id');
+        return Settings::get('unifi.mode') !== 'local' && Settings::has('unifi.cloud_api_key');
     }
 
-    /** Konsolen des UI-Kontos laden; bei genau einer Konsole wird sie gleich gewählt. Liefert die Fehlermeldung oder null. */
+    /** Konsolen laden; bei genau einer Konsole wird sie als Standard übernommen. Liefert die Fehlermeldung oder null. */
     private function refreshConsoles(): ?string
     {
-        try {
-            $consoles = \App\Services\Unifi\UnifiCloudClient::fromSettings()->consoles();
-            Cache::put('unifi.consoles', $consoles, 3600);
-            Cache::forget('unifi.consoles.error');
-            if (count($consoles) === 1 && ! Settings::has('unifi.console_id')) {
-                Settings::set('unifi.console_id', array_key_first($consoles));
-            }
-
-            return $consoles ? null : __('Mit diesem Schlüssel ist keine Konsole verbunden. Ist die UDM SE im selben UI-Konto (unifi.ui.com)?');
-        } catch (Throwable $e) {
-            Cache::put('unifi.consoles.error', $e->getMessage(), 300);
-
-            return $e->getMessage();
+        $error = UnifiConsoles::refresh();
+        $all = UnifiConsoles::all();
+        if (! $error && count($all) === 1 && ! Settings::has('unifi.console_id')) {
+            Settings::set('unifi.console_id', array_key_first($all));
         }
+
+        return $error;
     }
 
     public function update(Request $request): RedirectResponse
@@ -85,19 +79,13 @@ class SettingsController extends Controller
         }
         Activity::log('settings.updated', null, ['keys' => $changed]);
 
-        if (in_array('unifi.cloud_api_key', $changed, true)) {
-            Cache::forget('unifi.consoles');
-            Cache::forget('unifi.consoles.error');
-        }
-        if ($this->needsConsole()) {
+        if (in_array('unifi.cloud_api_key', $changed, true) && $this->cloudKeySet()) {
+            UnifiConsoles::forget();
             if ($error = $this->refreshConsoles()) {
                 return back()->with('error', __('Gespeichert, aber die Konsolen ließen sich nicht laden: :m', ['m' => $error]));
             }
-            if (! Settings::has('unifi.console_id')) {
-                return back()->with('ok', __('Gespeichert. Bitte jetzt unter „Konsole (UDM SE)“ deine UDM SE auswählen und nochmal speichern.'));
-            }
 
-            return back()->with('ok', __('Gespeichert. Die UDM SE wurde als Konsole übernommen.'));
+            return back()->with('ok', __('Gespeichert. :n Konsole(n) gefunden – ordne sie jetzt unter Standorte → Bearbeiten dem jeweiligen Restaurant zu.', ['n' => count(UnifiConsoles::all())]));
         }
 
         return back()->with('ok', __('Einstellungen gespeichert.'));
@@ -108,23 +96,38 @@ class SettingsController extends Controller
         if ($request->filled('unifi__cloud_api_key')) {
             Settings::set('unifi.cloud_api_key', $request->input('unifi__cloud_api_key'));
         }
-        Cache::forget('unifi.consoles');
-        Cache::forget('unifi.consoles.error');
+        UnifiConsoles::forget();
         if ($error = $this->refreshConsoles()) {
             return back()->with('error', $error);
         }
-        $n = count(Cache::get('unifi.consoles', []));
 
-        return back()->with('ok', $n === 1 && Settings::has('unifi.console_id')
-            ? __('Konsole gefunden und übernommen.')
-            : __(':n Konsolen gefunden. Bitte die UDM SE auswählen und speichern.', ['n' => $n]));
+        return back()->with('ok', __(':n Konsole(n) gefunden. Ordne sie unter Standorte → Bearbeiten dem jeweiligen Restaurant zu.', ['n' => count(UnifiConsoles::all())]));
     }
 
     public function testUnifi(UnifiManager $unifi): RedirectResponse
     {
+        $demo = (bool) session('demo');
+        Cache::forget('unifi.session');
+        $locations = \App\Models\Location::mode($demo)->where('active', true)->orderBy('name')->get();
+        // Cloud-Modus: jede Konsole einzeln prüfen (eine UDM je Restaurant)
+        if (! $demo && Settings::get('unifi.mode') !== 'local' && $locations->isNotEmpty()) {
+            $lines = [];
+            $ok = true;
+            foreach ($locations as $location) {
+                try {
+                    $sites = $unifi->forLocation($location)->sites();
+                    $lines[] = "✓ {$location->name}: ".implode(', ', $sites);
+                } catch (Throwable $e) {
+                    $ok = false;
+                    $lines[] = "✗ {$location->name}: ".$e->getMessage();
+                }
+            }
+            Cache::put('unifi.health', ['ok' => $ok, 'at' => now()->toDateTimeString(), 'error' => $ok ? null : implode(' | ', $lines)], 600);
+
+            return back()->with($ok ? 'ok' : 'error', implode(' · ', $lines));
+        }
         try {
-            Cache::forget('unifi.session');
-            $sites = $unifi->client((bool) session('demo'))->sites();
+            $sites = $unifi->client($demo)->sites();
             Cache::put('unifi.health', ['ok' => true, 'at' => now()->toDateTimeString(), 'sites' => $sites], 600);
 
             return back()->with('ok', __('Verbindung klappt. Gefundene Sites: :s', ['s' => implode(', ', array_map(

@@ -42,6 +42,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminLocale::class])->prefix('ad
         Route::post('/standorte', [LocationController::class, 'store'])->name('locations.store');
         Route::get('/standorte/{location}', [LocationController::class, 'edit'])->name('locations.edit');
         Route::put('/standorte/{location}', [LocationController::class, 'update'])->name('locations.update');
+        Route::post('/standorte/{location}/unifi-test', [LocationController::class, 'test'])->name('locations.test');
     });
 
     Route::get('/netzwerk', [\App\Http\Controllers\Admin\NetworkController::class, 'index'])->middleware('can:dashboard.view')->name('network');

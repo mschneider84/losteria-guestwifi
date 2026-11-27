@@ -3,6 +3,7 @@
 return [
     'title' => 'Free guest Wi-Fi',
     'headline' => 'Benvenuti! Lovely to have you here.',
+    'choose' => 'Which restaurant are you in?',
     'welcome' => 'Enjoy free Wi-Fi while we cook for you.',
     'session_info' => 'Free Wi-Fi for :duration',
     'speed_info' => 'up to :mbit Mbit/s',

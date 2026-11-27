@@ -17,8 +17,8 @@ class Settings
     /** Schlüssel => [Gruppe, Bezeichnung, Typ, Standard, geheim] */
     public const FIELDS = [
         'unifi.mode' => ['unifi', 'Verbindung zur UDM', 'select:cloud=Über die UniFi-Cloud (empfohlen),local=Direkt (VPN/Freigabe nötig)', 'cloud', false],
-        'unifi.cloud_api_key' => ['unifi', 'Site Manager API-Schlüssel (unifi.ui.com → API)', 'password', '', true],
-        'unifi.console_id' => ['unifi', 'Konsole (UDM SE)', 'text', '', false],
+        'unifi.cloud_api_key' => ['unifi', 'Site Manager API-Schlüssel (unifi.ui.com → API) – gilt für alle Standorte', 'password', '', true],
+        'unifi.console_id' => ['unifi', 'Standard-Konsole (nur wenn am Standort keine gewählt ist)', 'text', '', false],
         'unifi.url' => ['unifi', 'Nur bei „Direkt“: Adresse der UDM SE', 'url', 'https://192.168.1.1', false],
         'unifi.username' => ['unifi', 'Nur bei „Direkt“: Benutzer (lokales Service-Konto)', 'text', '', false],
         'unifi.password' => ['unifi', 'Nur bei „Direkt“: Passwort', 'password', '', true],

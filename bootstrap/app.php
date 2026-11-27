@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Laravel Cloud steht hinter einem Load Balancer: echte Gast-IP aus X-Forwarded-For (für die Zuordnung zum Restaurant)
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

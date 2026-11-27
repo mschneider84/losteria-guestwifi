@@ -3,6 +3,7 @@
 return [
     'title' => 'Wi-Fi gratuito per gli ospiti',
     'headline' => 'Benvenuti! Che piacere avervi qui.',
+    'choose' => 'In quale ristorante si trova?',
     'welcome' => 'Navigate gratis mentre cuciniamo per voi.',
     'session_info' => 'Wi-Fi gratuito per :duration',
     'speed_info' => 'fino a :mbit Mbit/s',

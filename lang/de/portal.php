@@ -3,6 +3,7 @@
 return [
     'title' => 'Kostenloses Gäste-WLAN',
     'headline' => 'Benvenuti! Schön, dass Sie da sind.',
+    'choose' => 'In welchem Restaurant sind Sie?',
     'welcome' => 'Surfen Sie kostenlos, während wir für Sie kochen.',
     'session_info' => 'Freies WLAN für :duration',
     'speed_info' => 'bis :mbit Mbit/s',

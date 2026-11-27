@@ -42,7 +42,7 @@ class GuestAuthorizer
         ]);
 
         try {
-            $this->unifi->client($demo)->authorizeGuest(
+            $this->unifi->forLocation($location, $demo)->authorizeGuest(
                 $location->unifi_site,
                 $device['mac'],
                 $location->session_minutes,
