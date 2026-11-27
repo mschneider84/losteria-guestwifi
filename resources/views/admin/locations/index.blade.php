@@ -5,6 +5,23 @@
     <h1>📍 {{ __('Standorte') }}</h1>
     <a href="{{ route('admin.locations.create') }}" class="btn">＋ {{ __('Standort anlegen') }}</a>
 </div>
+@php
+    $portalHost = request()->getHost();
+    $portalIp = \Illuminate\Support\Facades\Cache::remember('portal.ip.'.$portalHost, 3600, fn () => (($ip = gethostbyname($portalHost)) !== $portalHost) ? $ip : null);
+@endphp
+<details class="panel udm-guide" @if($locations->isEmpty()) open @endif>
+    <summary><strong>📡 {{ __('So stellst du die UDM eines Restaurants ein') }}</strong></summary>
+    <p class="muted small">{{ __('In UniFi Network der jeweiligen UDM (z. B. AT_WOERGL_UDM_01). Die Texte im „Landing Page Designer“ von UniFi werden nicht gebraucht – Gäste sehen die Seite aus diesem Portal.') }}</p>
+    <ol class="steps">
+        <li>{{ __('Hotspot → Authentication: alle Haken bei Password, Payment, Vouchers, RADIUS raus. Unter „One Way Methods“ „External Portal Server“ anhaken.') }}</li>
+        <li>{{ __('Als Server') }} <code>{{ $portalHost }}</code> {{ __('eintragen. Verlangt das Feld eine IPv4-Adresse:') }} <code>{{ $portalIp ?? '–' }}</code> {{ __('eintragen und zusätzlich „Redirect using hostname“ (bzw. „Domain“) einschalten und dort') }} <code>{{ $portalHost }}</code> {{ __('eintragen. Nur so bleibt es stabil, denn die IP von Laravel Cloud kann sich ändern.') }}</li>
+        <li>{{ __('„HTTPS Redirection“ / „Encrypted URL“ aus lassen, „Secure Portal“ an.') }}</li>
+        <li>{{ __('Pre-Authorization Allowances (Walled Garden):') }} <code>{{ $portalHost }}</code> {{ __('hinzufügen.') }}</li>
+        <li>{{ __('Settings → WiFi → Gäste-WLAN: Sicherheit „Open“, „Hotspot Portal“ (bzw. Application „Hotspot“) einschalten, speichern.') }}</li>
+        <li>{{ __('Hier im Portal beim Standort die UniFi-Konsole wählen, „Verbindung testen“ und dann mit dem Handy ins Gäste-WLAN.') }}</li>
+    </ol>
+</details>
+
 @if($locations->isEmpty())
     <div class="empty"><p>{{ __('Noch kein Standort. Jedes Restaurant bekommt eine eigene Gästeseite und eine UniFi-Site.') }}</p>
         <a href="{{ route('admin.locations.create') }}" class="btn">＋ {{ __('Standort anlegen') }}</a></div>

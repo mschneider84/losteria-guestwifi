@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.5.0', 'build' => 10, 'date' => '2026-11-27 08:20', 'type' => 'new', 'area' => 'Standorte', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
+        'text' => 'Unter Standorte steht jetzt eine Schritt-für-Schritt-Anleitung für die UDM jedes Restaurants – mit der Portal-Adresse und der aktuellen IP zum Abschreiben.',
+        'text_en' => 'Locations now shows a step-by-step guide for each restaurant’s UDM – with the portal address and current IP to copy.'],
     ['version' => '1.4.1', 'build' => 9, 'date' => '2026-11-27 08:06', 'type' => 'fix', 'area' => 'UniFi', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
         'text' => 'Bei „keine Berechtigung für diese Konsole“ steht jetzt die richtige Ursache: Der API-Schlüssel braucht neben „Site Manager“ auch den Bereich „UniFi-Anwendungen“ (Network) mit den Sites der Restaurants.',
         'text_en' => 'A “no permission for this console” error now names the real cause: besides “Site Manager” the API key needs the “UniFi applications” (Network) scope with the restaurants’ sites.'],
