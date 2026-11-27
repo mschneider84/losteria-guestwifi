@@ -216,7 +216,6 @@ class PortalController extends Controller
             'demo' => $demo,
             'invalid' => $invalid,
             'termsUrl' => \App\Support\Legal::url('terms', $location, $lang),
-            'privacyUrl' => \App\Support\Legal::url('privacy', $location, $lang),
         ]);
     }
 

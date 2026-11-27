@@ -49,8 +49,21 @@ class GuestPageTest extends TestCase
         $this->get(route('portal.legal', ['test', 'nutzungsbedingungen', 'lang' => 'en']))->assertOk()->assertSee('Please use fairly.');
         $this->get(route('portal.legal', ['test', 'nutzungsbedingungen', 'lang' => 'it']))->assertOk()->assertSee('fair'); // Fallback Deutsch
         $this->get(route('portal.legal', ['test', 'impressum']))->assertOk()->assertDontSee('<script>', false);
-        $this->get(route('portal.legal', ['test', 'datenschutz']))->assertNotFound();
+        $this->get(route('portal.legal', ['test', 'datenschutz']))->assertOk()->assertSee('fair'); // gemeinsamer Text
         $this->assertNotSame('2026-11', Settings::get('privacy.consent_version'));
+        $this->get(route('admin.guest-page.edit'))->assertDontSee('Datenschutzerklärung</strong>', false);
+    }
+
+    public function test_existing_privacy_text_is_merged_into_terms(): void
+    {
+        \Illuminate\Support\Facades\DB::table('legal_texts')->insert([
+            ['key' => 'terms', 'content' => json_encode(['de' => 'Regeln']), 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'privacy', 'content' => json_encode(['de' => 'Datenschutz-Text', 'en' => 'Privacy text']), 'created_at' => now(), 'updated_at' => now()],
+        ]);
+        (require database_path('migrations/2026_11_30_000200_merge_privacy_into_terms.php'))->up();
+        $this->assertSame("Regeln\n\nDatenschutz-Text", \App\Support\Legal::text('terms', 'de'));
+        $this->assertSame('Privacy text', \App\Support\Legal::text('terms', 'en'));
+        $this->assertSame(0, \Illuminate\Support\Facades\DB::table('legal_texts')->where('key', 'privacy')->count());
     }
 
     public function test_default_logo_upload_is_used_when_location_has_none(): void

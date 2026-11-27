@@ -15,11 +15,11 @@ class Legal
     /** Schlüssel => [Adresse auf der Gästeseite, Übersetzungsschlüssel, Einstellung für externen Link] */
     public const PAGES = [
         'terms' => ['nutzungsbedingungen', 'portal.terms', 'portal.terms_url'],
-        'privacy' => ['datenschutz', 'portal.privacy', 'portal.privacy_url'],
         'imprint' => ['impressum', 'portal.imprint', 'portal.imprint_url'],
     ];
 
-    public const LABELS = ['terms' => 'Nutzungsbedingungen', 'privacy' => 'Datenschutzerklärung', 'imprint' => 'Impressum'];
+    /** Nutzungsbedingungen und Datenschutz sind bei L'Osteria ein gemeinsamer Text. */
+    public const LABELS = ['terms' => 'Nutzungsbedingungen & Datenschutz', 'imprint' => 'Impressum'];
 
     /** @return array<string, array<string, string>> key => [lang => Text] */
     public static function all(): array
@@ -56,7 +56,7 @@ class Legal
     public static function links(Location $location, string $lang): array
     {
         $links = [];
-        foreach (['imprint', 'privacy', 'terms'] as $key) {
+        foreach (['terms', 'imprint'] as $key) {
             if ($url = self::url($key, $location, $lang)) {
                 $links[$key] = ['label' => __(self::PAGES[$key][1]), 'url' => $url];
             }
@@ -67,6 +67,9 @@ class Legal
 
     public static function keyFromSlug(string $slug): ?string
     {
+        if ($slug === 'datenschutz') {
+            return 'terms'; // gemeinsamer Text
+        }
         foreach (self::PAGES as $key => [$s]) {
             if ($s === $slug) {
                 return $key;

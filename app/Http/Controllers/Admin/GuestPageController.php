@@ -53,7 +53,7 @@ class GuestPageController extends Controller
         }
         // Geänderte Nutzungsbedingungen/Datenschutz = neue Version der Einwilligung (wird bei Newsletter-Anmeldungen gespeichert)
         $after = Legal::all();
-        if (($before['terms'] ?? []) != ($after['terms'] ?? []) || ($before['privacy'] ?? []) != ($after['privacy'] ?? [])) {
+        if (($before['terms'] ?? []) != ($after['terms'] ?? [])) {
             Settings::set('privacy.consent_version', now()->format('Y-m-d H:i'));
         }
         Activity::log('guest-page.updated');

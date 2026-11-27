@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.6.1', 'build' => 14, 'date' => '2026-11-27 08:57', 'type' => 'fix', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Nutzungsbedingungen und Datenschutz sind jetzt ein gemeinsamer Text „Nutzungsbedingungen & Datenschutz“ (Deutsch, Englisch, Italienisch), daneben bleibt das Impressum. Ein bereits eingetragener Datenschutz-Text wurde automatisch angehängt. Auf der Gästeseite gibt es dafür einen Link und einen Haken.',
+        'text_en' => 'Terms of use and privacy are now one combined text “Terms of use & privacy” (German, English, Italian), plus the legal notice. An existing privacy text was appended automatically. The guest page shows one link and one checkbox for it.'],
     ['version' => '1.6.0', 'build' => 13, 'date' => '2026-11-27 08:55', 'type' => 'new', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
         'text' => 'Neu unter Einstellungen → „Gästeseite & Rechtstexte“: Nutzungsbedingungen, Datenschutzerklärung und Impressum direkt im Portal schreiben (Deutsch, Englisch, Italienisch). Die Texte stehen auf der Gästeseite unten und beim Haken „Ich akzeptiere …“. Dort lädst du auch das Standard-Logo für alle Restaurants hoch.',
         'text_en' => 'New under Settings → “Guest page & legal texts”: write terms of use, privacy policy and legal notice directly in the portal (German, English, Italian). They appear at the bottom of the guest page and next to the “I accept …” box. The default logo for all restaurants is uploaded there too.'],

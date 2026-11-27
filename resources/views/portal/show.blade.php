@@ -49,7 +49,7 @@
 
             <label class="check">
                 <input type="checkbox" name="terms" value="1" required @checked(old('terms'))>
-                <span>{!! __('portal.terms_accept', ['terms' => e($termsUrl ?: '#terms'), 'privacy' => e($privacyUrl ?: ($termsUrl ?: '#terms'))]) !!}</span>
+                <span>{!! __('portal.terms_accept', ['terms' => e($termsUrl ?: '#terms')]) !!}</span>
             </label>
             @error('terms')<p class="err">{{ $message }}</p>@enderror
 
