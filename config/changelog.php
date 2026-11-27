@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.9.1', 'build' => 18, 'date' => '2026-11-27 14:40', 'type' => 'fix', 'area' => 'Freischaltung', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
+        'text' => 'Freischaltung findet das Gerät des Gastes jetzt zuverlässiger: Findet die UniFi-Suche nach der Geräteadresse nichts, wird die Geräteliste der UDM durchsucht (unabhängig von Groß-/Kleinschreibung und Trennzeichen), mit bis zu drei Versuchen für gerade erst verbundene Geräte. Schlägt es trotzdem fehl, steht im Systemstatus, wie viele Geräte die UDM gemeldet hat.',
+        'text_en' => 'Authorization now finds the guest’s device more reliably: if UniFi’s search by device address returns nothing, the UDM’s client list is searched (ignoring case and separators), with up to three tries for devices that just connected. If it still fails, system status shows how many devices the UDM reported.'],
     ['version' => '1.9.0', 'build' => 17, 'date' => '2026-11-27 10:15', 'type' => 'new', 'area' => 'Anmeldung', 'audience' => 'admin', 'source' => null, 'module' => 'system',
         'text' => 'Anmeldung über das L’Osteria Dashboard: Im Dashboard „Gäste-WLAN öffnen“ klicken, Name und Rolle kommen von dort. Das Gäste-WLAN hat damit keine eigene Benutzerverwaltung mehr; unter Benutzer siehst du nur noch, wer da war, und kannst sperren. Der Passwort-Login bleibt als Notfall-Zugang für Superadmins. Einrichten unter Einstellungen → Dashboard-Schnittstelle → „Schlüssel erzeugen“.',
         'text_en' => 'Sign-in via the L’Osteria dashboard: click “Open guest Wi-Fi” in the dashboard, name and role come from there. The guest Wi-Fi portal no longer has its own user management; Users only shows who signed in and lets you block someone. Password sign-in remains as emergency access for super admins. Set up under Settings → Dashboard interface → “Generate key”.'],

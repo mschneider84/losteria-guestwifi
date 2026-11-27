@@ -23,6 +23,10 @@ use Illuminate\Support\Facades\Http;
  */
 class UnifiCloudClient implements UnifiClient
 {
+    public const LOOKUP_TRIES = 3;
+
+    public static int $lookupWaitMs = 1500;
+
     public const BASE = 'https://api.ui.com';
 
     public function __construct(
@@ -201,16 +205,44 @@ class UnifiCloudClient implements UnifiClient
         return $this->request('get', '/sites', ['limit' => 200])->json('data', []);
     }
 
+    /**
+     * Client-ID zur MAC. Erst über den Filter der Integration API; liefert der nichts (Schreibweise, Proxy),
+     * die Client-Liste durchsuchen und die MAC ohne Trennzeichen vergleichen. Gerade angemeldete Geräte
+     * tauchen manchmal erst nach ein paar Sekunden auf – deshalb bis zu drei Versuche.
+     */
     private function clientId(string $siteId, string $mac): string
     {
-        $mac = strtolower($mac);
-        $data = $this->request('get', "/sites/{$siteId}/clients", ['filter' => "macAddress.eq('{$mac}')"])->json('data', []);
-        $id = $data[0]['id'] ?? null;
-        if (! $id) {
-            throw new UnifiException('Das Gerät ist (noch) nicht im WLAN angemeldet.');
+        $want = self::macKey($mac);
+        $seen = 0;
+        for ($try = 0; $try < self::LOOKUP_TRIES; $try++) {
+            if ($try > 0) {
+                usleep(self::$lookupWaitMs * 1000);
+            }
+            try {
+                foreach ($this->request('get', "/sites/{$siteId}/clients", ['filter' => "macAddress.eq('".strtolower($mac)."')"])->json('data', []) as $c) {
+                    if (self::macKey((string) ($c['macAddress'] ?? '')) === $want && ! empty($c['id'])) {
+                        return (string) $c['id'];
+                    }
+                }
+            } catch (UnifiException) {
+                // Filter nicht unterstützt → unten über die Liste
+            }
+            $all = $this->paged("/sites/{$siteId}/clients");
+            $seen = count($all);
+            foreach ($all as $c) {
+                if (self::macKey((string) ($c['macAddress'] ?? '')) === $want && ! empty($c['id'])) {
+                    return (string) $c['id'];
+                }
+            }
         }
 
-        return $id;
+        throw new UnifiException("Das Gerät ist (noch) nicht im WLAN angemeldet. ({$seen} Geräte auf der Site, Gerät …".substr($want, -4).' nicht dabei)');
+    }
+
+    /** MAC ohne Trennzeichen, klein: aa:bb…, AA-BB…, aabb… vergleichbar machen. */
+    public static function macKey(string $mac): string
+    {
+        return strtolower(preg_replace('/[^0-9a-fA-F]/', '', $mac));
     }
 
     private function request(string $method, string $path, array $data = []): Response

@@ -33,7 +33,8 @@ class UnifiCloudClientTest extends TestCase
 
     public function test_unknown_device_gives_clear_error(): void
     {
-        Http::fake([self::BASE.'/sites*' => Http::sequence()->push(['data' => [['id' => 's', 'internalReference' => 'default']]])->push(['data' => []])]);
+        UnifiCloudClient::$lookupWaitMs = 0;
+        Http::fake([self::BASE.'/sites*' => Http::sequence()->push(['data' => [['id' => 's', 'internalReference' => 'default']]])->whenEmpty(Http::response(['data' => []]))]);
         $this->expectExceptionMessage('nicht im WLAN angemeldet');
         (new UnifiCloudClient('k', 'console-1'))->authorizeGuest('default', 'aa:bb:cc:dd:ee:ff', 60);
     }

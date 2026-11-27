@@ -35,7 +35,7 @@ class MultiConsoleTest extends TestCase
     {
         Http::fake([
             'api.ui.com/v1/connector/consoles/*/proxy/network/integration/v1/sites?*' => Http::response(['data' => [['id' => 's1', 'internalReference' => 'default']]]),
-            'api.ui.com/v1/connector/consoles/*/proxy/network/integration/v1/sites/s1/clients?*' => Http::response(['data' => [['id' => 'cl1']]]),
+            'api.ui.com/v1/connector/consoles/*/proxy/network/integration/v1/sites/s1/clients?*' => Http::response(['data' => [['id' => 'cl1', 'macAddress' => 'aa:bb:cc:dd:ee:01'], ['id' => 'cl2', 'macAddress' => 'AA:BB:CC:DD:EE:02']]]),
             'api.ui.com/*' => Http::response([]),
         ]);
         UnifiCloudClient::forLocation($this->woergl)->authorizeGuest('default', 'aa:bb:cc:dd:ee:01', 60);
@@ -43,6 +43,38 @@ class MultiConsoleTest extends TestCase
 
         Http::assertSent(fn (Request $r) => $r->method() === 'POST' && str_contains($r->url(), '/consoles/c-woergl/') && $r->hasHeader('X-API-KEY', 'konto-key'));
         Http::assertSent(fn (Request $r) => $r->method() === 'POST' && str_contains($r->url(), '/consoles/c-kuf/') && $r->hasHeader('X-API-KEY', 'eigener-key'));
+    }
+
+    public function test_client_lookup_falls_back_to_list_and_never_takes_a_wrong_device(): void
+    {
+        UnifiCloudClient::$lookupWaitMs = 0;
+        $base = 'api.ui.com/v1/connector/consoles/c-woergl/proxy/network/integration/v1';
+        Http::fake(function (Request $r) use ($base) {
+            if (str_contains($r->url(), $base.'/sites?')) {
+                return Http::response(['data' => [['id' => 's1', 'internalReference' => 'default']]]);
+            }
+            if (str_contains($r->url(), '/sites/s1/clients?') && str_contains(urldecode($r->url()), 'filter=')) {
+                return Http::response(['data' => [['id' => 'fremd', 'macAddress' => '11:22:33:44:55:66']]]); // Filter ignoriert
+            }
+            if (str_contains($r->url(), '/sites/s1/clients?')) {
+                return Http::response(['offset' => 0, 'totalCount' => 2, 'data' => [
+                    ['id' => 'fremd', 'macAddress' => '11:22:33:44:55:66'], ['id' => 'gast', 'macAddress' => 'AA-BB-CC-DD-EE-01'],
+                ]]);
+            }
+
+            return Http::response([]);
+        });
+        UnifiCloudClient::forLocation($this->woergl)->authorizeGuest('default', 'aa:bb:cc:dd:ee:01', 60);
+        Http::assertSent(fn (Request $r) => $r->method() === 'POST' && str_contains($r->url(), '/clients/gast/actions'));
+        Http::assertNotSent(fn (Request $r) => $r->method() === 'POST' && str_contains($r->url(), '/clients/fremd/'));
+
+        try {
+            UnifiCloudClient::forLocation($this->woergl)->authorizeGuest('default', 'aa:bb:cc:dd:ee:99', 60);
+            $this->fail('kein Fehler');
+        } catch (\App\Services\Unifi\UnifiException $e) {
+            $this->assertStringContainsString('2 Geräte auf der Site', $e->getMessage());
+            $this->assertStringNotContainsString('aa:bb:cc:dd:ee:99', $e->getMessage());
+        }
     }
 
     public function test_location_key_is_stored_encrypted(): void
