@@ -32,8 +32,10 @@ class NetworkCollector
                 $n = $this->collect($location);
                 $result[$location->slug] = "{$n['clients']} Geräte, davon {$n['guests']} Gäste";
                 Cache::forget("network.failed.{$location->id}");
+                Cache::put("unifi.health.{$location->id}", ['ok' => true, 'at' => now()->toDateTimeString()], 86400);
             } catch (Throwable $e) {
                 $result[$location->slug] = 'Fehler: '.$e->getMessage();
+                Cache::put("unifi.health.{$location->id}", ['ok' => false, 'at' => now()->toDateTimeString(), 'error' => $e->getMessage()], 86400);
                 // Nur den ersten Fehler einer Serie protokollieren, nicht alle 5 Minuten
                 if (! Cache::get("network.failed.{$location->id}")) {
                     DB::table('system_logs')->insert([

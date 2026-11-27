@@ -92,4 +92,14 @@ class MultiConsoleTest extends TestCase
         $this->expectExceptionMessage('UniFi-Anwendungen');
         UnifiCloudClient::forLocation($this->woergl)->sites();
     }
+
+    public function test_status_page_shows_unifi_per_location(): void
+    {
+        \Illuminate\Support\Facades\Cache::put("unifi.health.{$this->woergl->id}", ['ok' => false, 'at' => now()->toDateTimeString(), 'error' => 'HTTP 403'], 60);
+        $admin = User::create(['name' => 'A', 'email' => 'a@test.example', 'password' => 'passwort-lang-genug', 'role' => 'superadmin']);
+        $this->actingAs($admin)->get(route('admin.status'))->assertOk()
+            ->assertSee('UniFi · Wörgl')->assertSee('HTTP 403')
+            ->assertSee('UniFi · Kufstein')->assertSee('noch nicht geprüft')
+            ->assertDontSee('Zugang fehlt in den Einstellungen');
+    }
 }

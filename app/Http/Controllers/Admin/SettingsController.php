@@ -117,9 +117,11 @@ class SettingsController extends Controller
                 try {
                     $sites = $unifi->forLocation($location)->sites();
                     $lines[] = "✓ {$location->name}: ".implode(', ', $sites);
+                    Cache::put("unifi.health.{$location->id}", ['ok' => true, 'at' => now()->toDateTimeString()], 86400);
                 } catch (Throwable $e) {
                     $ok = false;
                     $lines[] = "✗ {$location->name}: ".$e->getMessage();
+                    Cache::put("unifi.health.{$location->id}", ['ok' => false, 'at' => now()->toDateTimeString(), 'error' => $e->getMessage()], 86400);
                 }
             }
             Cache::put('unifi.health', ['ok' => $ok, 'at' => now()->toDateTimeString(), 'error' => $ok ? null : implode(' | ', $lines)], 600);

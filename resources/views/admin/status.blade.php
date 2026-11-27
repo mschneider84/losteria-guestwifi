@@ -11,6 +11,9 @@
             <li><span @class(['state', 'ok' => $c['ok'] === true, 'bad' => $c['ok'] === false, 'unk' => $c['ok'] === null])></span><strong>{{ $c['name'] }}</strong><span class="muted">{{ $c['detail'] }}</span></li>
         @endforeach
     </ul>
+    @can('settings.manage')
+        <form method="post" action="{{ route('admin.settings.unifi-test') }}" class="mt">@csrf<button class="btn ghost">🔌 {{ __('UniFi jetzt prüfen') }}</button></form>
+    @endcan
 </section>
 <section class="panel">
     <h2>{{ __('Löschfristen') }}</h2>

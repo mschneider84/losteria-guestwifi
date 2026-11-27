@@ -28,17 +28,31 @@ class SystemController extends Controller
         });
         $heartbeat = Cache::get('scheduler.heartbeat');
         $checks[] = ['name' => __('Zeitplan (Heartbeat)'), 'ok' => $heartbeat && now()->diffInMinutes($heartbeat) < 10,
-            'detail' => $heartbeat ? __('zuletzt :t', ['t' => \Carbon\Carbon::parse($heartbeat)->format('d.m.Y H:i')]) : __('noch kein Lauf')];
-        $unifi = Cache::get('unifi.health');
-        $checks[] = ['name' => __('UniFi-Verbindung'), 'ok' => $unifi['ok'] ?? null,
-            'detail' => $unifi ? (($unifi['ok'] ? __('erreichbar') : $unifi['error']).' · '.\Carbon\Carbon::parse($unifi['at'])->format('d.m. H:i'))
-                : (Settings::has('unifi.username') ? __('noch nicht geprüft') : __('Zugang fehlt in den Einstellungen'))];
+            'detail' => $heartbeat ? __('zuletzt :t', ['t' => \Carbon\Carbon::parse($heartbeat)->format('d.m.Y H:i')]) : __('noch kein Lauf – in Laravel Cloud den Scheduler einschalten')];
+        $locations = \App\Models\Location::mode(false)->where('active', true)->orderBy('name')->get();
+        if (Settings::get('unifi.mode') !== 'local' && $locations->isNotEmpty()) {
+            // Eine UDM je Restaurant: Verbindung je Standort
+            foreach ($locations as $l) {
+                $h = Cache::get("unifi.health.{$l->id}");
+                $hasConsole = $l->unifi_console_id || Settings::has('unifi.console_id');
+                $hasKey = $l->unifi_api_key || Settings::has('unifi.cloud_api_key');
+                $checks[] = ['name' => __('UniFi · :n', ['n' => $l->name]), 'ok' => $h['ok'] ?? ((! $hasKey || ! $hasConsole) ? false : null),
+                    'detail' => ! $hasKey ? __('API-Schlüssel fehlt (Einstellungen)') : (! $hasConsole ? __('keine Konsole gewählt (Standorte → Bearbeiten)')
+                        : ($h ? (($h['ok'] ? __('erreichbar') : $h['error']).' · '.\Carbon\Carbon::parse($h['at'])->format('d.m. H:i')) : __('noch nicht geprüft')))];
+            }
+        } else {
+            $unifi = Cache::get('unifi.health');
+            $configured = Settings::get('unifi.mode') === 'local' ? Settings::has('unifi.username') : Settings::has('unifi.cloud_api_key');
+            $checks[] = ['name' => __('UniFi-Verbindung'), 'ok' => $unifi['ok'] ?? null,
+                'detail' => $unifi ? (($unifi['ok'] ? __('erreichbar') : $unifi['error']).' · '.\Carbon\Carbon::parse($unifi['at'])->format('d.m. H:i'))
+                    : ($configured ? __('noch nicht geprüft') : __('Zugang fehlt in den Einstellungen'))];
+        }
         $net = Cache::get('network.last_run');
         $netErrors = collect($net['result'] ?? [])->filter(fn ($r) => str_starts_with($r, 'Fehler'));
         $checks[] = ['name' => __('Netzwerk-Auswertung'), 'ok' => $net ? ($netErrors->isEmpty() && now()->diffInMinutes($net['at']) < 15) : null,
             'detail' => $net ? __('zuletzt :t', ['t' => \Carbon\Carbon::parse($net['at'])->format('d.m.Y H:i')]).($netErrors->isNotEmpty() ? ' · '.$netErrors->keys()->implode(', ').': '.$netErrors->first() : '') : __('noch kein Lauf')];
         $checks[] = ['name' => __('Mail-Absender'), 'ok' => Settings::has('mail.from_address'),
-            'detail' => Settings::get('mail.from_address') ?: __('nicht eingetragen')];
+            'detail' => Settings::get('mail.from_address') ?: __('nicht eingetragen (Einstellungen → E-Mail)')];
 
         return view('admin.status', [
             'checks' => $checks,

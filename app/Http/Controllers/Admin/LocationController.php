@@ -107,9 +107,12 @@ class LocationController extends Controller
         $this->guardMode($location);
         try {
             $sites = $unifi->forLocation($location, $location->is_demo)->sites();
+            \Illuminate\Support\Facades\Cache::put("unifi.health.{$location->id}", ['ok' => true, 'at' => now()->toDateTimeString()], 86400);
 
             return back()->with('ok', __('Verbindung klappt. Sites auf der Konsole: :s', ['s' => implode(', ', array_map(fn ($k, $v) => "$v ($k)", array_keys($sites), $sites))]));
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Cache::put("unifi.health.{$location->id}", ['ok' => false, 'at' => now()->toDateTimeString(), 'error' => $e->getMessage()], 86400);
+
             return back()->with('error', __('Verbindung fehlgeschlagen: :m', ['m' => $e->getMessage()]));
         }
     }

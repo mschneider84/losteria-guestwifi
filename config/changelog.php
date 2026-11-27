@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.5.2', 'build' => 12, 'date' => '2026-11-27 08:28', 'type' => 'fix', 'area' => 'Systemstatus', 'audience' => 'admin', 'source' => null, 'module' => 'system',
+        'text' => 'Der Systemstatus prüft die UniFi-Verbindung jetzt je Restaurant (eigene UDM) statt nur der alten Einzel-Einstellung, mit Knopf „UniFi jetzt prüfen“. Bei fehlendem Zeitplan und Mail-Absender steht dabei, wo du es einstellst.',
+        'text_en' => 'System status now checks the UniFi connection per restaurant (own UDM) instead of the old single setting, with a “Check UniFi now” button. Missing scheduler and mail sender show where to set them.'],
     ['version' => '1.5.1', 'build' => 11, 'date' => '2026-11-27 08:16', 'type' => 'fix', 'area' => 'Standorte', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
         'text' => 'Die UDM-Anleitung zeigt immer die Gäste-Adresse des Portals (z. B. guest.losteria.at), auch wenn du über eine andere Adresse angemeldet bist.',
         'text_en' => 'The UDM guide always shows the portal’s guest address (e.g. guest.losteria.at), even when you are signed in via another address.'],
