@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.7.0', 'build' => 15, 'date' => '2026-11-27 09:20', 'type' => 'new', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Die Gästeseite sieht jetzt aus wie losteria.net: rote Kopfleiste mit Logo, große rote Überschriften, runde rote Knöpfe und schwarzer Fuß. Die Schriften liegen im Portal selbst, damit sie auch vor der Freischaltung laden. Die Standardfarbe ist jetzt das L’Osteria-Rot (#DB052C); Restaurants mit der alten Standardfarbe wurden umgestellt.',
+        'text_en' => 'The guest page now looks like losteria.net: red header with logo, large red headlines, round red buttons and a black footer. Fonts are served by the portal itself so they load before authorization. The default colour is now L’Osteria red (#DB052C); restaurants using the old default were switched.'],
     ['version' => '1.6.1', 'build' => 14, 'date' => '2026-11-27 08:57', 'type' => 'fix', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
         'text' => 'Nutzungsbedingungen und Datenschutz sind jetzt ein gemeinsamer Text „Nutzungsbedingungen & Datenschutz“ (Deutsch, Englisch, Italienisch), daneben bleibt das Impressum. Ein bereits eingetragener Datenschutz-Text wurde automatisch angehängt. Auf der Gästeseite gibt es dafür einen Link und einen Haken.',
         'text_en' => 'Terms of use and privacy are now one combined text “Terms of use & privacy” (German, English, Italian), plus the legal notice. An existing privacy text was appended automatically. The guest page shows one link and one checkbox for it.'],

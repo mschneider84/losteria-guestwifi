@@ -42,7 +42,7 @@ class Settings
         'portal.imprint_url' => ['portal', 'Externer Link Impressum (optional)', 'url', '', false],
         'brand.name' => ['brand', 'Name', 'text', "L'Osteria Gäste-WLAN", false],
         'brand.company' => ['brand', 'Firma (Copyright)', 'text', "L'Osteria", false],
-        'brand.color' => ['brand', 'Markenfarbe', 'color', '#b3261e', false],
+        'brand.color' => ['brand', 'Markenfarbe', 'color', '#db052c', false],
     ];
 
     private static ?array $cache = null;

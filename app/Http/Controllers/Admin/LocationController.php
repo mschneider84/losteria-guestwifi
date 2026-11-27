@@ -30,7 +30,7 @@ class LocationController extends Controller
     public function create(): View
     {
         return view('admin.locations.form', ['consoles' => $this->consoles(), 'location' => new Location([
-            'session_minutes' => 240, 'brand_color' => '#b3261e', 'unifi_site' => 'default',
+            'session_minutes' => 240, 'brand_color' => '#db052c', 'unifi_site' => 'default',
             'newsletter_enabled' => true, 'collect_email' => true, 'active' => true, 'down_kbps' => 20000, 'up_kbps' => 5000,
         ])]);
     }

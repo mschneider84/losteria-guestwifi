@@ -1,78 +1,91 @@
-/* Gästeseite – mobil zuerst, ohne Build-Schritt */
+/* Gästeseite – angelehnt an losteria.net: Markenrot, League Gothic, Oswald, Open Sans Condensed.
+   Schriften liegen lokal (public/fonts), weil Gäste vor der Freischaltung kein Google Fonts erreichen. */
+@font-face { font-family: "League Gothic"; src: url(../fonts/league-gothic-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Oswald"; src: url(../fonts/oswald-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Oswald"; src: url(../fonts/oswald-latin-500-normal.woff2) format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Open Sans Condensed"; src: url(../fonts/open-sans-latin-wdth-normal.woff2) format("woff2"); font-weight: 300 800; font-stretch: 75% 100%; font-display: swap; }
 :root {
-    --cream: #f6f1e7; --ink: #2b2420; --muted: #7a6f66; --line: #e7dfd2; --panel: #fffdf9;
-    --green: #2e7d4f; --red: #c8352b; --radius: 18px;
-    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --ink: #000; --muted: #5f5f5f; --line: #d9d9d9; --soft: #f4f4f4; --green: #2e7d4f;
+    --display: "League Gothic", "Oswald", Impact, "Arial Narrow", sans-serif;
+    --cta: "Oswald", "Arial Narrow", sans-serif;
+    --text: "Open Sans Condensed", "Arial Narrow", Roboto, Helvetica, Arial, sans-serif;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; }
-body { background: var(--cream); color: var(--ink); font: 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
-.bg { position: fixed; inset: 0; z-index: -1;
-    background:
-        radial-gradient(1200px 600px at 50% -10%, color-mix(in srgb, var(--brand) 22%, transparent), transparent 70%),
-        repeating-linear-gradient(45deg, transparent 0 22px, rgba(43,36,32,.025) 22px 23px),
-        repeating-linear-gradient(-45deg, transparent 0 22px, rgba(43,36,32,.025) 22px 23px),
-        var(--cream); }
-.wrap { max-width: 440px; margin: 0 auto; padding: max(20px, env(safe-area-inset-top)) 16px 28px; }
-.demo-band { background: #2a5bb8; color: #fff; text-align: center; font-size: 13px; padding: 7px 12px; border-radius: 999px; margin-bottom: 14px; }
-.card { background: var(--panel); border-radius: var(--radius); box-shadow: 0 1px 0 var(--line), 0 18px 40px -18px rgba(60,35,20,.35); padding: 26px 22px 22px; border-top: 5px solid var(--brand); }
-.brand { text-align: center; margin-bottom: 18px; }
-.logo { max-height: 64px; max-width: 220px; }
-.logo-placeholder { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; }
-.logo-placeholder .mark { font-family: var(--serif); font-size: 27px; font-style: italic; letter-spacing: .3px; color: var(--brand); line-height: 1.1; }
-.logo-placeholder .city { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
-.tricolore { display: inline-flex; gap: 0; height: 3px; width: 54px; border-radius: 2px; overflow: hidden; }
-.tricolore i { flex: 1; } .tricolore i:nth-child(1) { background: #1f8a4c; } .tricolore i:nth-child(2) { background: #fff; outline: 1px solid var(--line); } .tricolore i:nth-child(3) { background: #ce2b37; }
+body { background: #fff; color: var(--ink); font: 300 17px/1.5 var(--text); font-stretch: 75%; letter-spacing: .01em; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; min-height: 100vh; }
+a { color: var(--brand); }
+
+/* Kopf: rote Leiste mit Logo */
+.top { background: var(--brand); color: #fff; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: max(14px, env(safe-area-inset-top)) 16px 14px; }
+.logo { max-height: 52px; max-width: 220px; display: block; }
+.wordmark { font: 400 30px/1 var(--display); letter-spacing: 4px; text-transform: uppercase; border: 2px solid #fff; padding: 6px 12px 3px; }
+.top .city { font: 400 13px var(--cta); letter-spacing: 3px; text-transform: uppercase; opacity: .9; }
+
+.wrap { flex: 1; width: 100%; max-width: 460px; margin: 0 auto; padding: 28px 16px 36px; }
+.demo-band { background: #000; color: #fff; text-align: center; font: 400 14px var(--cta); letter-spacing: .5px; padding: 6px 12px; border-radius: 50px; margin-bottom: 18px; }
+
+/* Überschriften wie „DELIZIOSO!“ */
 .hero { text-align: center; }
-.wifi { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 12px; color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, #fff); }
-h1 { font-family: var(--serif); font-weight: 600; font-size: 26px; line-height: 1.2; margin: 0 0 8px; }
-.lead { color: var(--muted); margin: 0 0 14px; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
-.chip { font-size: 13px; background: #f3ece0; border-radius: 999px; padding: 5px 12px; }
-.form { display: grid; gap: 14px; }
-.check { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; font-size: 14px; cursor: pointer; }
-.check input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--brand); }
+h1 { font: 400 46px/1.02 var(--display); letter-spacing: 3px; text-transform: uppercase; color: var(--brand); margin: 0 0 12px; }
+.wifi { width: 54px; height: 54px; display: grid; place-items: center; margin: 0 auto 10px; color: var(--brand); }
+.lead { font-size: 18px; margin: 0 auto 16px; max-width: 34ch; }
+.hero::after, .rule { content: ""; display: block; height: 0; border-bottom: 2px dotted var(--line); margin: 18px 0 22px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.chip { font: 400 14px var(--cta); letter-spacing: .5px; border: 1px solid var(--ink); border-radius: 50px; padding: 3px 14px 4px; }
+
+/* Formular */
+.form { display: grid; gap: 16px; }
+.check { display: grid; grid-template-columns: 24px 1fr; gap: 12px; align-items: start; font-size: 16px; cursor: pointer; }
+.check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--brand); }
 .check em { color: var(--muted); font-style: normal; }
-.check a, .terms summary { color: var(--brand); }
-.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-.field input { width: 100%; font-size: 16px; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; }
-.field input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent); }
+.check a, .terms summary { color: var(--brand); font-weight: 600; }
+.field label { display: block; font: 400 14px var(--cta); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 4px; }
+.field input { width: 100%; font: 400 17px var(--text); font-stretch: 75%; padding: 12px 14px; border: 1px solid var(--ink); border-radius: 0; background: #fff; }
+.field input:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
 .hidden { display: none; }
 .hp { position: absolute; left: -9999px; }
-.btn { display: block; width: 100%; text-align: center; text-decoration: none; border: 0; border-radius: 999px; padding: 15px 18px; font: 600 17px var(--sans); color: #fff; background: var(--brand); cursor: pointer; box-shadow: 0 8px 20px -10px var(--brand); transition: transform .1s; margin-top: 4px; }
+
+/* Buttons: Pille wie „jetzt probieren“ */
+.btn { display: block; width: 100%; text-align: center; text-decoration: none; border: 2px solid var(--brand); border-radius: 50px; padding: 9px 24px 11px; font: 400 23px/1.2 var(--cta); letter-spacing: 1px; color: #fff; background: var(--brand); cursor: pointer; transition: background .15s, color .15s, transform .1s; margin-top: 6px; }
+.btn:hover { background: #fff; color: var(--brand); }
 .btn:active { transform: scale(.98); }
 .btn.busy { opacity: .7; }
-.err { color: var(--red); font-size: 13px; margin: -6px 0 0; }
-.alert { background: #fdecea; color: #8a1f17; border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 14px; }
-.alert small { display: block; margin-top: 4px; opacity: .8; }
-.notice { background: #f3ece0; border-radius: 12px; padding: 12px 14px; font-size: 14px; margin: 6px 0 14px; text-align: center; }
-.terms { margin-top: 16px; font-size: 13px; color: var(--muted); }
+.btn.ghost { background: #fff; color: var(--brand); }
+.btn.ghost:hover { background: var(--brand); color: #fff; }
+
+.err { color: var(--brand); font-size: 15px; font-weight: 600; margin: -8px 0 0; }
+.alert { border-left: 4px solid var(--brand); background: var(--soft); padding: 12px 14px; font-size: 16px; margin-bottom: 16px; }
+.alert small { display: block; margin-top: 4px; color: var(--muted); }
+.notice { background: var(--soft); padding: 12px 14px; font-size: 16px; margin: 0 0 16px; text-align: center; }
+.terms { margin-top: 18px; font-size: 15px; color: var(--muted); }
 .terms summary { cursor: pointer; }
-.done .ok { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 12px; background: var(--green); color: #fff; font-size: 32px; }
+.done .ok { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 14px; background: var(--green); color: #fff; font-size: 32px; }
 .muted { color: var(--muted); } .center { text-align: center; }
-.langs { display: flex; justify-content: center; gap: 6px; margin: 18px 0 8px; }
-.langs a { font-size: 13px; color: var(--muted); text-decoration: none; padding: 5px 11px; border-radius: 999px; }
-.langs a.active { background: var(--ink); color: #fff; }
-.legal { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
-.legal a { color: var(--muted); }
-@media (prefers-color-scheme: dark) {
-    :root { --cream: #1a1614; --ink: #f1ebe3; --muted: #b3a89d; --line: #3a322c; --panel: #241f1c; }
-    .chip, .notice { background: #2f2824; }
-    .field input { background: #1a1614; color: var(--ink); }
-    .wifi { background: #2f2824; }
-    .langs a.active { background: var(--ink); color: #1a1614; }
-    .bg { background: radial-gradient(1200px 600px at 50% -10%, color-mix(in srgb, var(--brand) 25%, transparent), transparent 70%), var(--cream); }
-}
-@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+
+/* Fuß: schwarz wie auf losteria.net */
+.foot { background: #000; color: #fff; text-align: center; padding: 26px 16px max(26px, env(safe-area-inset-bottom)); display: grid; gap: 12px; }
+.langs { display: flex; justify-content: center; gap: 6px; }
+.langs a { font: 400 15px var(--cta); letter-spacing: 1px; text-transform: uppercase; color: #fff; text-decoration: none; padding: 3px 12px 4px; border-radius: 50px; border: 1px solid transparent; }
+.langs a.active { border-color: #fff; }
+.legal { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; }
+.legal a { color: #fff; }
+.foot small { color: #9a9a9a; font-size: 13px; }
+
 /* Marketingaktion aus dem Dashboard */
-.promo { margin: 4px 0 20px; border-radius: 14px; overflow: hidden; background: color-mix(in srgb, var(--brand) 7%, var(--panel)); border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line)); }
+.promo { margin: 0 0 22px; background: #000; color: #fff; overflow: hidden; }
 .promo-img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; max-width: 100%; }
-.promo-body { padding: 14px 16px 16px; display: grid; gap: 6px; }
-.promo-tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); font-weight: 700; }
-.promo h2 { font-family: var(--serif); font-size: 20px; line-height: 1.25; margin: 0; }
-.promo p { margin: 0; font-size: 14px; color: var(--muted); }
-.promo-btn { margin-top: 8px; padding: 11px 16px; font-size: 15px; }
-.choose { display: grid; gap: 10px; margin-top: 16px; } .choose .btn { text-align: center; text-decoration: none; display: block; background: var(--brand); }
-.legal-text { text-align: left; font-size: 15px; line-height: 1.6; } .legal-text h1 { font-size: 22px; } .legal-text h2 { font-size: 17px; margin-top: 18px; } .legal-text a { color: var(--brand); }
-.btn.ghost { background: transparent; color: var(--brand); box-shadow: none; border: 1px solid currentColor; }
+.promo-body { padding: 16px 18px 18px; display: grid; gap: 6px; text-align: center; }
+.promo-tag { font: 400 13px var(--cta); letter-spacing: 3px; text-transform: uppercase; color: #fff; opacity: .8; }
+.promo h2 { font: 400 34px/1.05 var(--display); letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+.promo p { margin: 0; font-size: 16px; color: #e6e6e6; }
+.promo-btn { margin-top: 10px; font-size: 20px; background: #fff; color: var(--brand); border-color: #fff; }
+.promo-btn:hover { background: var(--brand); color: #fff; }
+
+.choose { display: grid; gap: 12px; margin-top: 8px; }
+.legal-text { text-align: left; font-size: 17px; line-height: 1.6; }
+.legal-text h1 { font-size: 40px; text-align: center; }
+.legal-text h2 { font: 400 26px/1.1 var(--display); letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); margin: 26px 0 6px; }
+.legal-text h3 { font: 500 18px var(--cta); margin: 18px 0 4px; }
+
+@media (min-width: 600px) { h1 { font-size: 60px; } .wrap { padding-top: 40px; } }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }

@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 class DemoData
 {
     public const LOCATIONS = [
-        ['name' => 'Osteria Centrale', 'city' => 'München', 'slug' => 'demo-muenchen', 'unifi_site' => 'default', 'brand_color' => '#b3261e', 'weight' => 1.3],
+        ['name' => 'Osteria Centrale', 'city' => 'München', 'slug' => 'demo-muenchen', 'unifi_site' => 'default', 'brand_color' => '#db052c', 'weight' => 1.3],
         ['name' => 'Osteria del Ponte', 'city' => 'Nürnberg', 'slug' => 'demo-nuernberg', 'unifi_site' => 'nbg', 'brand_color' => '#1f6b4f', 'weight' => 0.9],
         ['name' => 'Osteria al Porto', 'city' => 'Hamburg', 'slug' => 'demo-hamburg', 'unifi_site' => 'hh', 'brand_color' => '#2a5bb8', 'weight' => 1.0],
     ];
