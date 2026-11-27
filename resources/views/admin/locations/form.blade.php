@@ -48,8 +48,12 @@
         <h2>🎨 {{ __('Gästeseite') }}</h2>
         <div class="two">
             <label>{{ __('Farbe') }}<input type="color" name="brand_color" value="{{ old('brand_color', $location->brand_color) }}"></label>
-            <label>{{ __('Logo') }}<input type="file" name="logo" accept="image/*" class="drop"></label>
+            <label>{{ __('Eigenes Logo (sonst Standard-Logo)') }}<input type="file" name="logo" accept="image/png,image/jpeg,image/webp" class="drop"></label>
         </div>
+        @if($location->exists && $location->logoUrl())
+            <div class="logo-preview"><img src="{{ $location->logoUrl() }}" alt="Logo"> <span class="muted small">{{ $location->logo_path ? __('eigenes Logo') : __('Standard-Logo') }}</span>
+                @if($location->logo_path)<label class="inline"><input type="checkbox" name="logo_remove" value="1"> {{ __('eigenes Logo entfernen') }}</label>@endif</div>
+        @endif
         @foreach(['de' => 'Deutsch', 'en' => 'English', 'it' => 'Italiano'] as $code => $label)
             <fieldset>
                 <legend>{{ $label }}</legend>
@@ -58,7 +62,11 @@
             </fieldset>
         @endforeach
         <label>{{ __('Weiterleitung nach dem Verbinden') }}<input type="url" name="redirect_url" value="{{ old('redirect_url', $location->redirect_url) }}" placeholder="https://"></label>
+        @if(\App\Support\Settings::get('modules.newsletter'))
         <label class="inline"><input type="checkbox" name="newsletter_enabled" value="1" @checked(old('newsletter_enabled', $location->newsletter_enabled))> {{ __('Newsletter-Anmeldung anbieten') }}</label>
+        @else
+            <input type="hidden" name="newsletter_enabled" value="{{ $location->newsletter_enabled ? 1 : 0 }}">
+        @endif
         <input type="hidden" name="collect_email" value="1">
     </section>
     <div class="formactions"><button class="btn">{{ __('Speichern') }}</button></div>

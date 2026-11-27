@@ -34,7 +34,7 @@
             <input type="hidden" name="lang" value="{{ $lang }}">
             <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-            @if($location->newsletter_enabled)
+            @if($location->newsletterActive())
                 <label class="check">
                     <input type="checkbox" name="newsletter" value="1" id="nl" @checked(old('newsletter'))>
                     <span>{{ __('portal.newsletter') }} <em>({{ __('portal.optional') }})</em></span>
@@ -49,7 +49,7 @@
 
             <label class="check">
                 <input type="checkbox" name="terms" value="1" required @checked(old('terms'))>
-                <span>{!! __('portal.terms_accept', ['terms' => $termsUrl ?: '#terms', 'privacy' => $privacyUrl ?: '#terms']) !!}</span>
+                <span>{!! __('portal.terms_accept', ['terms' => e($termsUrl ?: '#terms'), 'privacy' => e($privacyUrl ?: ($termsUrl ?: '#terms'))]) !!}</span>
             </label>
             @error('terms')<p class="err">{{ $message }}</p>@enderror
 

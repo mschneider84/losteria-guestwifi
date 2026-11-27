@@ -70,7 +70,7 @@ class GuestAuthorizer
             'expires_at' => now()->addMinutes($location->session_minutes),
         ]);
 
-        if ($newsletterEmail && $location->newsletter_enabled) {
+        if ($newsletterEmail && $location->newsletterActive()) {
             $this->subscribe($location, $newsletterEmail, $lang, $ip, $demo);
         }
 

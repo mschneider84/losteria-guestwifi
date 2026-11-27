@@ -9,6 +9,11 @@
 ## Übersicht
 Kennzahlen je Zeitraum (7, 14, 30, 90 Tage) und Standort: gerade online, Anmeldungen, Wiederkehrer, neue Newsletter-Kontakte. Darunter Anmeldungen pro Tag, Stoßzeiten und Sprachen.
 
+## Gästeseite & Rechtstexte
+Unter Einstellungen → „Gästeseite & Rechtstexte“ schreibst du Nutzungsbedingungen, Datenschutzerklärung und Impressum in Deutsch, Englisch und Italienisch (leere Sprachen zeigen den deutschen Text) und lädst das Standard-Logo hoch. Ein Restaurant kann unter Standorte ein eigenes Logo bekommen. Ändern sich Nutzungsbedingungen oder Datenschutz, wird die Version der Einwilligung automatisch erneuert.
+
+Das Newsletter-Modul schaltest du unter Einstellungen → Gästeseite ein oder aus.
+
 ## Netzwerk
 Was im WLAN los ist, alle 5 Minuten aktualisiert:
 - **Jetzt gerade**: Gäste im WLAN je Restaurant und Bereich, Auslastung im Vergleich zum Höchststand der letzten 30 Tage.

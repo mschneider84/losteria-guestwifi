@@ -22,6 +22,7 @@ return [
     'done_text' => 'Enjoy surfing – and buon appetito!',
     'done_newsletter' => 'We have sent you an e-mail. Please confirm your newsletter subscription there.',
     'done_redirect' => 'You will be redirected shortly …',
+    'back' => 'Back',
     'continue' => 'Continue',
     'demo' => 'Preview – no device will be connected.',
     'imprint' => 'Legal notice',

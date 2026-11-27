@@ -117,7 +117,7 @@ class PortalController extends Controller
             'website' => ['nullable', 'max:0'], // Honeypot
         ], [], ['terms' => trans('portal.terms_short'), 'email' => trans('portal.email')]);
 
-        $email = ($location->newsletter_enabled && ! empty($data['newsletter'])) ? $data['email'] : null;
+        $email = ($location->newsletterActive() && ! empty($data['newsletter'])) ? $data['email'] : null;
         $device['device_type'] = DeviceType::fromUserAgent($request->userAgent());
         $result = $authorizer->authorize($location, $device, $lang, $email, (string) $request->ip(), (bool) $device['demo']);
 
@@ -215,10 +215,25 @@ class PortalController extends Controller
             'lang' => $lang,
             'demo' => $demo,
             'invalid' => $invalid,
-            'termsUrl' => Settings::get('portal.terms_url'),
-            'privacyUrl' => Settings::get('portal.privacy_url'),
-            'imprintUrl' => Settings::get('portal.imprint_url'),
+            'termsUrl' => \App\Support\Legal::url('terms', $location, $lang),
+            'privacyUrl' => \App\Support\Legal::url('privacy', $location, $lang),
         ]);
+    }
+
+    /** Nutzungsbedingungen, Datenschutz oder Impressum – vor der Anmeldung erreichbar (gleiche Domain wie die Gästeseite). */
+    public function legal(Request $request, Location $location, string $page): View
+    {
+        $lang = $this->lang($request);
+        app()->setLocale($lang);
+        $key = \App\Support\Legal::keyFromSlug($page);
+        $html = \App\Support\Legal::html($key, $lang);
+        if ($html === null && $key === 'terms') {
+            $html = '<p>'.e(__('portal.terms_text')).'</p>';
+        }
+        abort_if($html === null, 404);
+
+        return view('portal.legal', ['location' => $location, 'lang' => $lang, 'title' => __(\App\Support\Legal::PAGES[$key][1]), 'html' => $html,
+            'demo' => (bool) ($request->session()->get("portal.{$location->id}")['demo'] ?? false)]);
     }
 
     private function lang(Request $request): string

@@ -79,7 +79,7 @@ class LocationController extends Controller
             'redirect_url' => 'nullable|url|max:255',
             'headline.*' => 'nullable|max:120',
             'welcome_text.*' => 'nullable|max:300',
-            'logo' => 'nullable|image|max:2048',
+            'logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
         ]);
         unset($data['logo'], $data['unifi_api_key_remove']);
         // Schlüssel ist write-only: leer = unverändert, Haken = entfernen
@@ -128,6 +128,10 @@ class LocationController extends Controller
 
     private function storeLogo(Request $request, Location $location): void
     {
+        if ($request->boolean('logo_remove') && $location->logo_path) {
+            \App\Support\Media::disk()->delete($location->logo_path);
+            $location->update(['logo_path' => null]);
+        }
         if ($request->hasFile('logo')) {
             $location->update(['logo_path' => $request->file('logo')->store('logos', \App\Support\Media::diskName())]);
         }

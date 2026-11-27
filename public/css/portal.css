@@ -74,3 +74,5 @@ h1 { font-family: var(--serif); font-weight: 600; font-size: 26px; line-height: 
 .promo p { margin: 0; font-size: 14px; color: var(--muted); }
 .promo-btn { margin-top: 8px; padding: 11px 16px; font-size: 15px; }
 .choose { display: grid; gap: 10px; margin-top: 16px; } .choose .btn { text-align: center; text-decoration: none; display: block; background: var(--brand); }
+.legal-text { text-align: left; font-size: 15px; line-height: 1.6; } .legal-text h1 { font-size: 22px; } .legal-text h2 { font-size: 17px; margin-top: 18px; } .legal-text a { color: var(--brand); }
+.btn.ghost { background: transparent; color: var(--brand); box-shadow: none; border: 1px solid currentColor; }

@@ -22,6 +22,7 @@ return [
     'done_text' => 'Viel Spaß beim Surfen – und buon appetito!',
     'done_newsletter' => 'Wir haben Ihnen eine E-Mail geschickt. Bitte bestätigen Sie dort Ihre Anmeldung zum Newsletter.',
     'done_redirect' => 'Sie werden gleich weitergeleitet …',
+    'back' => 'Zurück',
     'continue' => 'Weiter',
     'demo' => 'Vorschau – es wird kein Gerät freigeschaltet.',
     'imprint' => 'Impressum',

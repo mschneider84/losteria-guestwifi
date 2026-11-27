@@ -18,7 +18,7 @@
         @can('dashboard.view')<a href="{{ route('admin.network') }}" @class(['active' => request()->routeIs('admin.network')])>📶 {{ __('Netzwerk') }}</a>@endcan
         @can('locations.manage')<a href="{{ route('admin.locations.index') }}" @class(['active' => request()->routeIs('admin.locations.*')])>📍 {{ __('Standorte') }}</a>@endcan
         @can('dashboard.view')<a href="{{ route('admin.promotions.index') }}" @class(['active' => request()->routeIs('admin.promotions.*')])>📣 {{ __('Aktionen') }}</a>@endcan
-        @can('contacts.view')<a href="{{ route('admin.contacts.index') }}" @class(['active' => request()->routeIs('admin.contacts.*')])>✉️ {{ __('Newsletter') }}</a>@endcan
+        @if(\App\Support\Settings::get('modules.newsletter'))@can('contacts.view')<a href="{{ route('admin.contacts.index') }}" @class(['active' => request()->routeIs('admin.contacts.*')])>✉️ {{ __('Newsletter') }}</a>@endcan @endif
         @can('status.view')<a href="{{ route('admin.status') }}" @class(['active' => request()->routeIs('admin.status')])>🩺 {{ __('Systemstatus') }}</a>@endcan
     </nav>
     <div class="topright">
@@ -28,6 +28,7 @@
             <div class="menu">
                 <div class="menu-head"><strong>{{ $u->name }}</strong><span>{{ \App\Support\Permissions::ROLES[$u->role][0] ?? $u->role }}</span></div>
                 @can('settings.manage')<a href="{{ route('admin.settings') }}">⚙️ {{ __('Einstellungen') }}</a>@endcan
+                @can('settings.manage')<a href="{{ route('admin.guest-page.edit') }}">🖼 {{ __('Gästeseite & Rechtstexte') }}</a>@endcan
                 @can('settings.manage')<a href="{{ route('admin.api-keys.index') }}">🔌 {{ __('Dashboard-Schnittstelle') }}</a>@endcan
                 @can('users.manage')<a href="{{ route('admin.users.index') }}">👥 {{ __('Benutzer & Rollen') }}</a>@endcan
                 @can('demo')
@@ -78,7 +79,7 @@
     <a href="{{ route('admin.dashboard') }}">📊<span>{{ __('Übersicht') }}</span></a>
     @can('dashboard.view')<a href="{{ route('admin.network') }}">📶<span>{{ __('Netzwerk') }}</span></a>@endcan
     @can('locations.manage')<a href="{{ route('admin.locations.index') }}">📍<span>{{ __('Standorte') }}</span></a>@endcan
-    @can('contacts.view')<a href="{{ route('admin.contacts.index') }}">✉️<span>{{ __('Newsletter') }}</span></a>@endcan
+    @if(\App\Support\Settings::get('modules.newsletter'))@can('contacts.view')<a href="{{ route('admin.contacts.index') }}">✉️<span>{{ __('Newsletter') }}</span></a>@endcan @endif
     @can('status.view')<a href="{{ route('admin.status') }}">🩺<span>{{ __('Status') }}</span></a>@endcan
 </nav>
 </body>

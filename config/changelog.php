@@ -2,6 +2,12 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.6.0', 'build' => 13, 'date' => '2026-11-27 08:55', 'type' => 'new', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Neu unter Einstellungen → „Gästeseite & Rechtstexte“: Nutzungsbedingungen, Datenschutzerklärung und Impressum direkt im Portal schreiben (Deutsch, Englisch, Italienisch). Die Texte stehen auf der Gästeseite unten und beim Haken „Ich akzeptiere …“. Dort lädst du auch das Standard-Logo für alle Restaurants hoch.',
+        'text_en' => 'New under Settings → “Guest page & legal texts”: write terms of use, privacy policy and legal notice directly in the portal (German, English, Italian). They appear at the bottom of the guest page and next to the “I accept …” box. The default logo for all restaurants is uploaded there too.'],
+    ['version' => '1.6.0', 'build' => 13, 'date' => '2026-11-27 08:55', 'type' => 'new', 'area' => 'Newsletter', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Das Newsletter-Modul lässt sich unter Einstellungen → Gästeseite ein- und ausschalten und ist vorerst aus: keine Anmeldung auf der Gästeseite, kein Menüpunkt, keine Mails.',
+        'text_en' => 'The newsletter module can be switched on and off under Settings → Guest page and is off for now: no sign-up on the guest page, no menu item, no e-mails.'],
     ['version' => '1.5.2', 'build' => 12, 'date' => '2026-11-27 08:28', 'type' => 'fix', 'area' => 'Systemstatus', 'audience' => 'admin', 'source' => null, 'module' => 'system',
         'text' => 'Der Systemstatus prüft die UniFi-Verbindung jetzt je Restaurant (eigene UDM) statt nur der alten Einzel-Einstellung, mit Knopf „UniFi jetzt prüfen“. Bei fehlendem Zeitplan und Mail-Absender steht dabei, wo du es einstellst.',
         'text_en' => 'System status now checks the UniFi connection per restaurant (own UDM) instead of the old single setting, with a “Check UniFi now” button. Missing scheduler and mail sender show where to set them.'],

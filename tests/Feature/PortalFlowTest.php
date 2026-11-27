@@ -74,6 +74,7 @@ class PortalFlowTest extends TestCase
 
     public function test_newsletter_double_opt_in(): void
     {
+        \App\Support\Settings::set('modules.newsletter', true);
         $this->location();
         $this->get('/guest/s/default/?id=aa:bb:cc:dd:ee:ff');
         $this->post(route('portal.connect', 'test'), ['terms' => '1', 'newsletter' => '1', 'email' => 'gast@mail.example', 'lang' => 'en']);

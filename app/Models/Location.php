@@ -43,9 +43,21 @@ class Location extends Model
         return $values[$lang] ?? $fallback;
     }
 
+    /** Eigenes Logo des Standorts, sonst das Standard-Logo aus „Gästeseite & Rechtstexte“. */
     public function logoUrl(): ?string
     {
-        return $this->logo_path ? route('media.logo', [$this->slug, 'v' => substr(md5($this->logo_path), 0, 8)]) : null;
+        if ($this->logo_path) {
+            return route('media.logo', [$this->slug, 'v' => substr(md5($this->logo_path), 0, 8)]);
+        }
+        $default = \App\Support\Settings::get('brand.logo_path');
+
+        return $default ? route('media.default-logo', ['v' => substr(md5($default), 0, 8)]) : null;
+    }
+
+    /** Newsletter nur, wenn das Modul eingeschaltet ist und der Standort ihn anbietet. */
+    public function newsletterActive(): bool
+    {
+        return (bool) \App\Support\Settings::get('modules.newsletter') && $this->newsletter_enabled;
     }
 
     public function sessionLabel(): string

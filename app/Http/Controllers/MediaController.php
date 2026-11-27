@@ -14,6 +14,11 @@ class MediaController extends Controller
         return $this->serve($location->logo_path);
     }
 
+    public function defaultLogo(): Response
+    {
+        return $this->serve(\App\Support\Settings::get('brand.logo_path'));
+    }
+
     public function promotion(Promotion $promotion): Response
     {
         return $this->serve($promotion->image_path);

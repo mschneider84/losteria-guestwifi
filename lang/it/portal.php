@@ -22,6 +22,7 @@ return [
     'done_text' => 'Buona navigazione – e buon appetito!',
     'done_newsletter' => 'Ti abbiamo inviato un’e-mail. Conferma lì la tua iscrizione alla newsletter.',
     'done_redirect' => 'Tra poco verrai reindirizzato …',
+    'back' => 'Indietro',
     'continue' => 'Continua',
     'demo' => 'Anteprima – nessun dispositivo verrà connesso.',
     'imprint' => 'Note legali',

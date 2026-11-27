@@ -22,7 +22,9 @@ Route::get('/newsletter/abmelden/{token}', [PortalController::class, 'unsubscrib
 
 // Bilder (Logo, Aktionen) – immer über die Portal-Domain, damit sie im Walled Garden laden
 Route::get('/bild/logo/{location:slug}', [\App\Http\Controllers\MediaController::class, 'logo'])->name('media.logo');
+Route::get('/bild/logo', [\App\Http\Controllers\MediaController::class, 'defaultLogo'])->name('media.default-logo');
 Route::get('/bild/aktion/{promotion}', [\App\Http\Controllers\MediaController::class, 'promotion'])->name('media.promotion');
+Route::get('/wlan/{location:slug}/info/{page}', [PortalController::class, 'legal'])->whereIn('page', ['nutzungsbedingungen', 'datenschutz', 'impressum'])->name('portal.legal');
 Route::get('/wlan/{location:slug}/aktion/{promotion}', [PortalController::class, 'promotionClick'])->name('portal.promotion');
 
 // Verwaltung
@@ -54,6 +56,8 @@ Route::middleware(['auth', \App\Http\Middleware\AdminLocale::class])->prefix('ad
     Route::middleware('can:settings.manage')->group(function () {
         Route::get('/einstellungen', [SettingsController::class, 'index'])->name('settings');
         Route::put('/einstellungen', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('/einstellungen/gaesteseite', [\App\Http\Controllers\Admin\GuestPageController::class, 'edit'])->name('guest-page.edit');
+        Route::put('/einstellungen/gaesteseite', [\App\Http\Controllers\Admin\GuestPageController::class, 'update'])->name('guest-page.update');
         Route::get('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'keys'])->name('api-keys.index');
         Route::post('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'storeKey'])->name('api-keys.store');
         Route::delete('/einstellungen/schnittstelle/{key}', [\App\Http\Controllers\Admin\IntegrationController::class, 'destroyKey'])->name('api-keys.destroy');

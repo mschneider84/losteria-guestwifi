@@ -51,8 +51,10 @@ class SystemController extends Controller
         $netErrors = collect($net['result'] ?? [])->filter(fn ($r) => str_starts_with($r, 'Fehler'));
         $checks[] = ['name' => __('Netzwerk-Auswertung'), 'ok' => $net ? ($netErrors->isEmpty() && now()->diffInMinutes($net['at']) < 15) : null,
             'detail' => $net ? __('zuletzt :t', ['t' => \Carbon\Carbon::parse($net['at'])->format('d.m.Y H:i')]).($netErrors->isNotEmpty() ? ' · '.$netErrors->keys()->implode(', ').': '.$netErrors->first() : '') : __('noch kein Lauf')];
-        $checks[] = ['name' => __('Mail-Absender'), 'ok' => Settings::has('mail.from_address'),
-            'detail' => Settings::get('mail.from_address') ?: __('nicht eingetragen (Einstellungen → E-Mail)')];
+        if (Settings::get('modules.newsletter')) {
+            $checks[] = ['name' => __('Mail-Absender'), 'ok' => Settings::has('mail.from_address'),
+                'detail' => Settings::get('mail.from_address') ?: __('nicht eingetragen (Einstellungen → E-Mail)')];
+        }
 
         return view('admin.status', [
             'checks' => $checks,

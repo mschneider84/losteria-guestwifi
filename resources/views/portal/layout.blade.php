@@ -35,8 +35,9 @@
         @endforeach
     </nav>
     <footer class="legal">
-        @if(!empty($imprintUrl))<a href="{{ $imprintUrl }}" target="_blank">{{ __('portal.imprint') }}</a>@endif
-        @if(!empty($privacyUrl))<a href="{{ $privacyUrl }}" target="_blank">{{ __('portal.privacy') }}</a>@endif
+        @if($location)
+            @foreach(\App\Support\Legal::links($location, $lang) as $link)<a href="{{ $link['url'] }}">{{ $link['label'] }}</a>@endforeach
+        @endif
         <span>{{ \App\Support\Brand::copyright() }}</span>
     </footer>
 </main>
