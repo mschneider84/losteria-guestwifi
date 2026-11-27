@@ -77,4 +77,25 @@ class AdminTest extends TestCase
             ->assertSessionHas('ok');
         $this->assertDatabaseHas('meldungen', ['title' => 'Export als Excel', 'status' => 'new']);
     }
+
+    public function test_saving_cloud_key_loads_and_selects_single_console(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['https://api.ui.com/v1/hosts' => \Illuminate\Support\Facades\Http::response(['data' => [['id' => 'udm-1', 'ipAddress' => '1.2.3.4', 'reportedState' => ['name' => 'UDM SE']]]])]);
+        $this->actingAs($this->admin())->put(route('admin.settings.update'), ['unifi__mode' => 'cloud', 'unifi__cloud_api_key' => 'sm-key'])
+            ->assertSessionHas('ok');
+        $this->assertSame('udm-1', \App\Support\Settings::get('unifi.console_id'));
+        $this->get(route('admin.settings'))->assertOk()->assertSee('UDM SE · 1.2.3.4');
+    }
+
+    public function test_settings_page_offers_console_selection_when_several(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['https://api.ui.com/v1/hosts' => \Illuminate\Support\Facades\Http::response(['data' => [
+            ['id' => 'a', 'ipAddress' => '1.1.1.1', 'reportedState' => ['name' => 'UDM München']],
+            ['id' => 'b', 'ipAddress' => '2.2.2.2', 'reportedState' => ['name' => 'UDM Hamburg']],
+        ]])]);
+        \App\Support\Settings::set('unifi.cloud_api_key', 'sm-key');
+        $this->actingAs($this->admin())->get(route('admin.settings'))->assertOk()
+            ->assertSee('UDM München · 1.1.1.1')->assertSee('UDM Hamburg · 2.2.2.2')->assertSee('Konsolen neu laden');
+        $this->assertFalse(\App\Support\Settings::has('unifi.console_id'));
+    }
 }

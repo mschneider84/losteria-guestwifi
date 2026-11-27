@@ -2,6 +2,9 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.3.1', 'build' => 7, 'date' => '2026-11-27 07:58', 'type' => 'fix', 'area' => 'Einstellungen', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
+        'text' => 'Nach dem Speichern des UniFi-API-Schlüssels werden die Konsolen gleich geladen; bei nur einer UDM wird sie automatisch übernommen, sonst erscheint eine Auswahl. Der Knopf „Konsolen laden“ steht jetzt direkt am Feld, die Felder für „Direkt“ sind im Cloud-Modus ausgeblendet.',
+        'text_en' => 'After saving the UniFi API key the consoles are loaded right away; a single UDM is selected automatically, otherwise a list appears. The “Load consoles” button now sits next to the field, and the “direct” fields are hidden in cloud mode.'],
     ['version' => '1.3.0', 'build' => 6, 'date' => '2026-11-27 00:45', 'type' => 'new', 'area' => 'Netzwerk', 'audience' => 'admin', 'source' => null, 'module' => 'network',
         'text' => 'Neue Seite „Netzwerk“: Live-Auslastung je Restaurant und Bereich (Innen, Terrasse, Bar), wo die Gäste im Tagesverlauf sitzen, volle Zeiten nach Wochentag und Uhrzeit, Verweildauer, Stammgäste und Wirkung von Aktionen, Gerätetypen, Datenverbrauch und schwache Access Points. Daten kommen alle 5 Minuten über die UniFi-Cloud, Geräte werden nur pseudonym gezählt.',
         'text_en' => 'New “Network” page: live occupancy per restaurant and area (inside, terrace, bar), where guests sit throughout the day, busy times by weekday and hour, dwell time, regulars and campaign effect, device types, data usage and weak access points. Data comes every 5 minutes via the UniFi cloud; devices are only counted pseudonymously.'],

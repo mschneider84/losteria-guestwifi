@@ -191,8 +191,11 @@ class UnifiCloudClient implements UnifiClient
 
     private function request(string $method, string $path, array $data = []): Response
     {
-        if ($this->apiKey === '' || $this->consoleId === '') {
-            throw new UnifiException('UniFi-Cloud: API-Schlüssel oder Konsole fehlt in den Einstellungen.');
+        if ($this->apiKey === '') {
+            throw new UnifiException('UniFi-Cloud: Der API-Schlüssel fehlt in den Einstellungen.');
+        }
+        if ($this->consoleId === '') {
+            throw new UnifiException('UniFi-Cloud: Noch keine Konsole gewählt. In den Einstellungen „Konsolen laden“ klicken und die UDM SE auswählen.');
         }
         $url = self::BASE."/v1/connector/consoles/{$this->consoleId}/proxy/network/integration/v1{$path}";
         $response = $this->http()->{$method}($url, $data);

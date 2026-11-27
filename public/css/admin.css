@@ -139,3 +139,4 @@ h3.sub { font-size: 13px; color: var(--muted); font-weight: 600; margin: 16px 0 
 .area-input { width: 140px; padding: 5px 8px; }
 .tablewrap { overflow-x: auto; }
 .flash.info { background: color-mix(in srgb, var(--info) 12%, var(--panel)); color: var(--info); }
+[hidden] { display: none !important; }
