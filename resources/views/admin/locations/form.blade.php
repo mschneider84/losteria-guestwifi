@@ -34,15 +34,19 @@
             @if($location->unifi_api_key)<label class="inline"><input type="checkbox" name="unifi_api_key_remove" value="1"> {{ __('Eigenen Schlüssel entfernen') }}</label>@endif
         </details>
         <label>{{ __('UniFi-Site') }} <i class="tip" title="{{ __('Kurzname der Site in der UDM, steht in der Adresse /network/<site>/… – bei nur einer Site „default“.') }}">ⓘ</i><input name="unifi_site" value="{{ old('unifi_site', $location->unifi_site) }}" required></label>
-        <label>{{ __('Zeitlimit (Minuten)') }}<input type="number" name="session_minutes" value="{{ old('session_minutes', $location->session_minutes) }}" min="15" max="1440" required></label>
-        <div class="two">
-            <label>{{ __('Download (kbit/s)') }}<input type="number" name="down_kbps" value="{{ old('down_kbps', $location->down_kbps) }}" placeholder="{{ __('unbegrenzt') }}"></label>
-            <label>{{ __('Upload (kbit/s)') }}<input type="number" name="up_kbps" value="{{ old('up_kbps', $location->up_kbps) }}" placeholder="{{ __('unbegrenzt') }}"></label>
-        </div>
         @if($location->exists)
             <p><button class="btn ghost" formaction="{{ route('admin.locations.test', $location) }}" formmethod="post" name="_method" value="POST" formnovalidate>🔌 {{ __('Verbindung testen') }}</button> <span class="muted small">{{ __('(vorher speichern)') }}</span></p>
         @endif
-        <label>{{ __('Datenvolumen (MB)') }}<input type="number" name="quota_mb" value="{{ old('quota_mb', $location->quota_mb) }}" placeholder="{{ __('unbegrenzt') }}"></label>
+        <h3 class="mt">⏱ {{ __('Freischaltung') }}</h3>
+        <label class="inline"><input type="checkbox" name="use_default_limits" value="1" id="use-defaults" @checked(old('use_default_limits', $location->use_default_limits))> {{ __('Standardwerte verwenden') }} <span class="muted small">({{ __('aus „Gästeseite & Rechtstexte“: :d', ['d' => $defaultsLabel]) }})</span></label>
+        <div id="own-limits">
+            <div class="two">
+                <label>{{ __('WLAN frei pro Gast (Minuten)') }}<input type="number" name="session_minutes" value="{{ old('session_minutes', $location->session_minutes) }}" min="15" max="1440" required></label>
+                <label>{{ __('Datenvolumen pro Gast (MB, Download + Upload zusammen)') }}<input type="number" name="quota_mb" value="{{ old('quota_mb', $location->quota_mb) }}" placeholder="{{ __('unbegrenzt') }}"></label>
+                <label>{{ __('Max. Download pro Gast (kbit/s)') }}<input type="number" name="down_kbps" value="{{ old('down_kbps', $location->down_kbps) }}" placeholder="{{ __('unbegrenzt') }}"></label>
+                <label>{{ __('Max. Upload pro Gast (kbit/s)') }}<input type="number" name="up_kbps" value="{{ old('up_kbps', $location->up_kbps) }}" placeholder="{{ __('unbegrenzt') }}"></label>
+            </div>
+        </div>
     </section>
     <section class="panel">
         <h2>🎨 {{ __('Gästeseite') }}</h2>
@@ -54,11 +58,13 @@
             <div class="logo-preview"><img src="{{ $location->logoUrl() }}" alt="Logo"> <span class="muted small">{{ $location->logo_path ? __('eigenes Logo') : __('Standard-Logo') }}</span>
                 @if($location->logo_path)<label class="inline"><input type="checkbox" name="logo_remove" value="1"> {{ __('eigenes Logo entfernen') }}</label>@endif</div>
         @endif
+        <p class="muted small">{{ __('Leer lassen = Standardtext aus „Gästeseite & Rechtstexte“ (grau vorgeschlagen).') }}</p>
         @foreach(['de' => 'Deutsch', 'en' => 'English', 'it' => 'Italiano'] as $code => $label)
             <fieldset>
                 <legend>{{ $label }}</legend>
-                <label>{{ __('Überschrift') }}<input name="headline[{{ $code }}]" value="{{ old("headline.$code", $location->headline[$code] ?? '') }}" placeholder="{{ trans('portal.headline', [], $code) }}"></label>
-                <label>{{ __('Begrüßung') }}<input name="welcome_text[{{ $code }}]" value="{{ old("welcome_text.$code", $location->welcome_text[$code] ?? '') }}" placeholder="{{ trans('portal.welcome', [], $code) }}"></label>
+                @foreach(\App\Support\GuestDefaults::TEXTS as $field => [$tl, $max])
+                    <label>{{ __($tl) }}<input name="texts[{{ $field }}][{{ $code }}]" maxlength="{{ $max }}" value="{{ old("texts.$field.$code", $location->ownText($field)[$code] ?? '') }}" placeholder="{{ \App\Support\GuestDefaults::text($field, $code) ?: trans('portal.'.$field, [], $code) }}"></label>
+                @endforeach
             </fieldset>
         @endforeach
         <label>{{ __('Weiterleitung nach dem Verbinden') }}<input type="url" name="redirect_url" value="{{ old('redirect_url', $location->redirect_url) }}" placeholder="https://"></label>
@@ -72,3 +78,13 @@
     <div class="formactions"><button class="btn">{{ __('Speichern') }}</button></div>
 </form>
 @endsection
+@push('scripts')
+<script>
+(function () {
+    var c = document.getElementById('use-defaults'), box = document.getElementById('own-limits');
+    if (!c || !box) return;
+    function sync() { box.querySelectorAll('input').forEach(function (i) { i.disabled = c.checked; }); box.style.opacity = c.checked ? .5 : 1; }
+    c.addEventListener('change', sync); sync();
+})();
+</script>
+@endpush

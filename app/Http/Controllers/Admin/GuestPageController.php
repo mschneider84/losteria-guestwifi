@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Support\Activity;
+use App\Support\GuestDefaults;
 use App\Support\Legal;
 use App\Support\Media;
 use App\Support\Settings;
@@ -21,6 +22,10 @@ class GuestPageController extends Controller
             'texts' => Legal::all(),
             'logoPath' => Settings::get('brand.logo_path'),
             'previewLocation' => Location::mode((bool) session('demo'))->orderBy('name')->first(),
+            'uiTexts' => GuestDefaults::texts(),
+            'limits' => GuestDefaults::limits(),
+            'usingDefaults' => Location::mode((bool) session('demo'))->where('use_default_limits', true)->count(),
+            'locationCount' => Location::mode((bool) session('demo'))->count(),
         ]);
     }
 
@@ -32,6 +37,14 @@ class GuestPageController extends Controller
             'texts' => ['array'],
             'texts.*' => ['array'],
             'texts.*.*' => ['nullable', 'string', 'max:30000'],
+            'ui' => ['array'],
+            'ui.*' => ['array'],
+            'ui.*.*' => ['nullable', 'string', 'max:300'],
+            'limits' => ['array'],
+            'limits.session_minutes' => ['sometimes', 'required', 'integer', 'min:15', 'max:1440'],
+            'limits.down_kbps' => ['nullable', 'integer', 'min:256', 'max:1000000'],
+            'limits.up_kbps' => ['nullable', 'integer', 'min:256', 'max:1000000'],
+            'limits.quota_mb' => ['nullable', 'integer', 'min:10', 'max:100000'],
         ]);
 
         if ($request->boolean('logo_remove') && ($old = Settings::get('brand.logo_path'))) {
@@ -55,6 +68,15 @@ class GuestPageController extends Controller
         $after = Legal::all();
         if (($before['terms'] ?? []) != ($after['terms'] ?? [])) {
             Settings::set('privacy.consent_version', now()->format('Y-m-d H:i'));
+        }
+        foreach (array_keys(GuestDefaults::TEXTS) as $field) {
+            if (isset($data['ui'][$field])) {
+                GuestDefaults::saveText($field, array_map(fn ($t) => mb_substr((string) $t, 0, GuestDefaults::TEXTS[$field][1]), $data['ui'][$field]), $request->user()?->id);
+            }
+        }
+        if (isset($data['limits'])) {
+            GuestDefaults::saveLimits($data['limits']);
+            GuestDefaults::applyToLocations();
         }
         Activity::log('guest-page.updated');
 

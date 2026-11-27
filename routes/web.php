@@ -58,6 +58,10 @@ Route::middleware(['auth', \App\Http\Middleware\AdminLocale::class])->prefix('ad
         Route::put('/einstellungen', [SettingsController::class, 'update'])->name('settings.update');
         Route::get('/einstellungen/gaesteseite', [\App\Http\Controllers\Admin\GuestPageController::class, 'edit'])->name('guest-page.edit');
         Route::put('/einstellungen/gaesteseite', [\App\Http\Controllers\Admin\GuestPageController::class, 'update'])->name('guest-page.update');
+        Route::get('/einstellungen/bereiche', [\App\Http\Controllers\Admin\AreaController::class, 'index'])->name('areas.index');
+        Route::post('/einstellungen/bereiche', [\App\Http\Controllers\Admin\AreaController::class, 'store'])->name('areas.store');
+        Route::put('/einstellungen/bereiche', [\App\Http\Controllers\Admin\AreaController::class, 'update'])->name('areas.update');
+        Route::post('/einstellungen/bereiche/{area}/{dir}', [\App\Http\Controllers\Admin\AreaController::class, 'move'])->whereIn('dir', ['up', 'down'])->name('areas.move');
         Route::get('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'keys'])->name('api-keys.index');
         Route::post('/einstellungen/schnittstelle', [\App\Http\Controllers\Admin\IntegrationController::class, 'storeKey'])->name('api-keys.store');
         Route::delete('/einstellungen/schnittstelle/{key}', [\App\Http\Controllers\Admin\IntegrationController::class, 'destroyKey'])->name('api-keys.destroy');

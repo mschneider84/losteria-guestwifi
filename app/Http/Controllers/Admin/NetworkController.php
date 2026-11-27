@@ -40,8 +40,8 @@ class NetworkController extends Controller
             'live' => $stats->live($demo),
             'a' => $analysis,
             'aps' => $location ? AccessPoint::where('location_id', $location->id)->orderBy('area')->orderBy('name')->get() : collect(),
-            'areas' => array_values(array_filter(array_map('trim', explode(',', (string) Settings::get('network.areas'))))),
-            'colors' => self::AREA_COLORS,
+            'areas' => \App\Models\Area::names(),
+            'colors' => \App\Models\Area::colors() + self::AREA_COLORS,
             'lastRun' => Cache::get('network.last_run'),
             'enabled' => (bool) Settings::get('network.enabled'),
             'demo' => $demo,
@@ -52,7 +52,7 @@ class NetworkController extends Controller
     public function updateAreas(Request $request, Location $location): RedirectResponse
     {
         abort_unless($location->is_demo === (bool) session('demo'), 404);
-        $data = $request->validate(['area' => ['array'], 'area.*' => ['nullable', 'string', 'max:40', 'not_in:gesamt']]);
+        $data = $request->validate(['area' => ['array'], 'area.*' => ['nullable', 'string', \Illuminate\Validation\Rule::in(\App\Models\Area::names())]]);
         foreach ($data['area'] ?? [] as $id => $area) {
             AccessPoint::where('location_id', $location->id)->whereKey($id)->update(['area' => trim((string) $area) ?: null]);
         }

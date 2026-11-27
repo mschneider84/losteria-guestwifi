@@ -25,7 +25,6 @@ class Settings
         'unifi.verify_tls' => ['unifi', 'Nur bei „Direkt“: Zertifikat prüfen', 'bool', false, false],
         'unifi.timeout' => ['unifi', 'Zeitlimit je Aufruf (Sekunden)', 'int', 8, false],
         'network.enabled' => ['network', 'Netzwerk-Auswertungen alle 5 Minuten aus der UniFi-Cloud abholen', 'bool', true, false],
-        'network.areas' => ['network', 'Bereiche zur Auswahl (Komma-getrennt)', 'text', 'Innen,Terrasse,Bar,Eingang', false],
         'mail.host' => ['mail', 'SMTP-Server', 'text', '', false],
         'mail.port' => ['mail', 'SMTP-Port', 'int', 587, false],
         'mail.username' => ['mail', 'SMTP-Benutzer', 'text', '', false],

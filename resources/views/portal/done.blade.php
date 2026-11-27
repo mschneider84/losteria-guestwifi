@@ -3,8 +3,8 @@
 @section('content')
     <div class="hero done">
         <div class="ok" aria-hidden="true">✓</div>
-        <h1>{{ __('portal.done_title') }}</h1>
-        <p class="lead">{{ __('portal.done_text') }}</p>
+        <h1>{{ $location->guestText('done_title', $lang) }}</h1>
+        <p class="lead">{{ $location->guestText('done_text', $lang) }}</p>
         <div class="chips"><span class="chip">⏱ {{ __('portal.session_info', ['duration' => $location->sessionLabel()]) }}</span></div>
     </div>
     @if($newsletter)

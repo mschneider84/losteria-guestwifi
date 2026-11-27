@@ -29,6 +29,7 @@
                 <div class="menu-head"><strong>{{ $u->name }}</strong><span>{{ \App\Support\Permissions::ROLES[$u->role][0] ?? $u->role }}</span></div>
                 @can('settings.manage')<a href="{{ route('admin.settings') }}">⚙️ {{ __('Einstellungen') }}</a>@endcan
                 @can('settings.manage')<a href="{{ route('admin.guest-page.edit') }}">🖼 {{ __('Gästeseite & Rechtstexte') }}</a>@endcan
+                @can('settings.manage')<a href="{{ route('admin.areas.index') }}">🗺 {{ __('Bereiche') }}</a>@endcan
                 @can('settings.manage')<a href="{{ route('admin.api-keys.index') }}">🔌 {{ __('Dashboard-Schnittstelle') }}</a>@endcan
                 @can('users.manage')<a href="{{ route('admin.users.index') }}">👥 {{ __('Benutzer & Rollen') }}</a>@endcan
                 @can('demo')
@@ -82,5 +83,6 @@
     @if(\App\Support\Settings::get('modules.newsletter'))@can('contacts.view')<a href="{{ route('admin.contacts.index') }}">✉️<span>{{ __('Newsletter') }}</span></a>@endcan @endif
     @can('status.view')<a href="{{ route('admin.status') }}">🩺<span>{{ __('Status') }}</span></a>@endcan
 </nav>
+@stack('scripts')
 </body>
 </html>

@@ -2,6 +2,18 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
+    ['version' => '1.8.0', 'build' => 16, 'date' => '2026-11-27 09:30', 'type' => 'new', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Unter „Gästeseite & Rechtstexte“ stellst du jetzt für alle Restaurants die Texte der Vorschaltseite (Überschrift, Begrüßung, Knopf, Seite nach dem Verbinden – Deutsch, Englisch, Italienisch) und die Freischaltung pro Gast ein (Dauer, Datenvolumen, max. Download und Upload). Unter Standorte → Bearbeiten kann jedes Restaurant eigene Texte bekommen oder mit „Standardwerte verwenden“ die gemeinsamen Grenzen übernehmen.',
+        'text_en' => 'Under “Guest page & legal texts” you now set the splash page texts for all restaurants (headline, welcome, button, page after connecting – German, English, Italian) and the per-guest limits (duration, data volume, max. download and upload). Under Locations → Edit each restaurant can have its own texts or use “Use defaults” for the shared limits.'],
+    ['version' => '1.8.0', 'build' => 16, 'date' => '2026-11-27 09:30', 'type' => 'new', 'area' => 'Netzwerk', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Bereiche (Innen, Terrasse, Bar …) pflegst du jetzt als eigene Liste unter Einstellungen → Bereiche: anlegen, umbenennen, sortieren, Farbe wählen, löschen. Unter Netzwerk wählst du für jeden Access Point einen Bereich aus dieser Liste. Umbenennen gilt auch für bisherige Auswertungen; die bisherigen Bereiche wurden übernommen.',
+        'text_en' => 'Areas (inside, terrace, bar …) are now a list of their own under Settings → Areas: add, rename, sort, pick a colour, delete. Under Network you pick an area from this list for each access point. Renaming also applies to past statistics; existing areas were carried over.'],
+    ['version' => '1.8.0', 'build' => 16, 'date' => '2026-11-27 09:30', 'type' => 'fix', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Gäste sehen die Download- und Upload-Geschwindigkeit nicht mehr, nur noch wie lange das WLAN frei ist. Die Grenzen gelten weiter.',
+        'text_en' => 'Guests no longer see download and upload speed, only how long the Wi-Fi is free. The limits still apply.'],
+    ['version' => '1.8.0', 'build' => 16, 'date' => '2026-11-27 09:30', 'type' => 'fix', 'area' => 'Verwaltung', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
+        'text' => 'Auswahlfelder und Datei-Uploads laufen in den Formularen nicht mehr über den Rahmen hinaus.',
+        'text_en' => 'Select fields and file uploads in forms no longer overflow their box.'],
     ['version' => '1.7.0', 'build' => 15, 'date' => '2026-11-27 09:20', 'type' => 'new', 'area' => 'Gästeseite', 'audience' => 'admin', 'source' => null, 'module' => 'portal',
         'text' => 'Die Gästeseite sieht jetzt aus wie losteria.net: rote Kopfleiste mit Logo, große rote Überschriften, runde rote Knöpfe und schwarzer Fuß. Die Schriften liegen im Portal selbst, damit sie auch vor der Freischaltung laden. Die Standardfarbe ist jetzt das L’Osteria-Rot (#DB052C); Restaurants mit der alten Standardfarbe wurden umgestellt.',
         'text_en' => 'The guest page now looks like losteria.net: red header with logo, large red headlines, round red buttons and a black footer. Fonts are served by the portal itself so they load before authorization. The default colour is now L’Osteria red (#DB052C); restaurants using the old default were switched.'],

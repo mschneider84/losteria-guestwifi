@@ -5,13 +5,10 @@
         <div class="wifi" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.5a15 15 0 0 1 20 0"/><path d="M5 12a10 10 0 0 1 14 0"/><path d="M8.5 15.5a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
         </div>
-        <h1>{{ $location->text('headline', $lang, __('portal.headline')) }}</h1>
-        <p class="lead">{{ $location->text('welcome_text', $lang, __('portal.welcome')) }}</p>
+        <h1>{{ $location->guestText('headline', $lang) }}</h1>
+        <p class="lead">{{ $location->guestText('welcome', $lang) }}</p>
         <div class="chips">
             <span class="chip">⏱ {{ __('portal.session_info', ['duration' => $location->sessionLabel()]) }}</span>
-            @if($location->down_kbps)
-                <span class="chip">⚡ {{ __('portal.speed_info', ['mbit' => round($location->down_kbps / 1000)]) }}</span>
-            @endif
         </div>
     </div>
 
@@ -53,7 +50,7 @@
             </label>
             @error('terms')<p class="err">{{ $message }}</p>@enderror
 
-            <button type="submit" class="btn">{{ __('portal.connect') }}</button>
+            <button type="submit" class="btn">{{ $location->guestText('connect', $lang) }}</button>
         </form>
 
         @unless($termsUrl)

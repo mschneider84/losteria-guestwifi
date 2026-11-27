@@ -17,6 +17,8 @@ class Location extends Model
         return [
             'headline' => 'array',
             'welcome_text' => 'array',
+            'extra_texts' => 'array',
+            'use_default_limits' => 'boolean',
             'collect_email' => 'boolean',
             'newsletter_enabled' => 'boolean',
             'active' => 'boolean',
@@ -41,6 +43,23 @@ class Location extends Model
         $values = $this->{$field} ?? [];
 
         return $values[$lang] ?? $fallback;
+    }
+
+    /** Text der Gästeseite: eigener Text des Standorts → Standardtext für alle Restaurants → eingebauter Text. */
+    public function guestText(string $field, string $lang): string
+    {
+        return ($this->ownText($field)[$lang] ?? null)
+            ?: (\App\Support\GuestDefaults::text($field, $lang) ?: trans('portal.'.$field, [], $lang));
+    }
+
+    /** @return array<string, string> Sprache => eigener Text */
+    public function ownText(string $field): array
+    {
+        return (array) match ($field) {
+            'headline' => $this->headline,
+            'welcome' => $this->welcome_text,
+            default => $this->extra_texts[$field] ?? [],
+        };
     }
 
     /** Eigenes Logo des Standorts, sonst das Standard-Logo aus „Gästeseite & Rechtstexte“. */

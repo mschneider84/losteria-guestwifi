@@ -29,10 +29,10 @@ class LocationController extends Controller
 
     public function create(): View
     {
-        return view('admin.locations.form', ['consoles' => $this->consoles(), 'location' => new Location([
-            'session_minutes' => 240, 'brand_color' => '#db052c', 'unifi_site' => 'default',
-            'newsletter_enabled' => true, 'collect_email' => true, 'active' => true, 'down_kbps' => 20000, 'up_kbps' => 5000,
-        ])]);
+        return view('admin.locations.form', ['consoles' => $this->consoles(), 'defaultsLabel' => $this->defaultsLabel(), 'location' => new Location([
+            'brand_color' => '#db052c', 'unifi_site' => 'default', 'use_default_limits' => true,
+            'newsletter_enabled' => true, 'collect_email' => true, 'active' => true,
+        ] + \App\Support\GuestDefaults::limits())]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -48,7 +48,7 @@ class LocationController extends Controller
     {
         $this->guardMode($location);
 
-        return view('admin.locations.form', ['location' => $location, 'consoles' => $this->consoles()]);
+        return view('admin.locations.form', ['location' => $location, 'consoles' => $this->consoles(), 'defaultsLabel' => $this->defaultsLabel()]);
     }
 
     public function update(Request $request, Location $location): RedirectResponse
@@ -72,13 +72,15 @@ class LocationController extends Controller
             'unifi_api_key' => 'nullable|string|max:500',
             'unifi_api_key_remove' => 'nullable|boolean',
             'brand_color' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
-            'session_minutes' => 'required|integer|min:15|max:1440',
+            'use_default_limits' => 'nullable|boolean',
+            'session_minutes' => 'exclude_if:use_default_limits,1|required|integer|min:15|max:1440',
             'down_kbps' => 'nullable|integer|min:256|max:1000000',
             'up_kbps' => 'nullable|integer|min:256|max:1000000',
             'quota_mb' => 'nullable|integer|min:10|max:100000',
             'redirect_url' => 'nullable|url|max:255',
-            'headline.*' => 'nullable|max:120',
-            'welcome_text.*' => 'nullable|max:300',
+            'texts' => 'array',
+            'texts.*' => 'array',
+            'texts.*.*' => 'nullable|string|max:300',
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
         ]);
         unset($data['logo'], $data['unifi_api_key_remove']);
@@ -95,10 +97,28 @@ class LocationController extends Controller
         foreach (['newsletter_enabled', 'collect_email', 'active'] as $flag) {
             $data[$flag] = $request->boolean($flag);
         }
-        $data['headline'] = array_filter($request->input('headline', []));
-        $data['welcome_text'] = array_filter($request->input('welcome_text', []));
+        $texts = $request->input('texts', []);
+        $clean = fn (string $f) => array_filter(array_map(fn ($t) => trim((string) $t), array_intersect_key((array) ($texts[$f] ?? []), array_flip(['de', 'en', 'it']))));
+        $data['headline'] = $clean('headline');
+        $data['welcome_text'] = $clean('welcome');
+        $data['extra_texts'] = array_filter(['connect' => $clean('connect'), 'done_title' => $clean('done_title'), 'done_text' => $clean('done_text')]) ?: null;
+        unset($data['texts']);
+        $data['use_default_limits'] = $request->boolean('use_default_limits');
+        if ($data['use_default_limits']) {
+            $data = array_merge($data, \App\Support\GuestDefaults::limits());
+        }
 
         return $data;
+    }
+
+    private function defaultsLabel(): string
+    {
+        $l = \App\Support\GuestDefaults::limits();
+        $parts = [(new Location(['session_minutes' => $l['session_minutes']]))->sessionLabel()];
+        $parts[] = $l['down_kbps'] ? round($l['down_kbps'] / 1000).' Mbit/s' : __('ohne Bandbreitenlimit');
+        $parts[] = $l['quota_mb'] ? $l['quota_mb'].' MB' : __('ohne Datenlimit');
+
+        return implode(' · ', $parts);
     }
 
     /** Verbindung zur Konsole dieses Standorts prüfen. */

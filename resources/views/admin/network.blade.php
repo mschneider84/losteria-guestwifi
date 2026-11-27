@@ -227,7 +227,7 @@
     @else
     <form method="post" action="{{ route('admin.network.areas', $location) }}">
         @csrf @method('PUT')
-        <datalist id="areas">@foreach($areas as $ar)<option value="{{ $ar }}">@endforeach</datalist>
+        @can('settings.manage')<p class="muted small">{{ __('Bereiche anlegen, umbenennen und sortieren:') }} <a href="{{ route('admin.areas.index') }}">{{ __('Einstellungen → Bereiche') }}</a></p>@endcan
         <div class="tablewrap">
         <table class="table">
             <thead><tr><th>{{ __('Access Point') }}</th><th>{{ __('Bereich') }}</th><th class="num">{{ __('Geräte jetzt') }}</th><th class="num">{{ __('Höchststand') }}</th><th class="num">{{ __('Funk-Wiederh.') }}</th><th>{{ __('Zustand') }}</th></tr></thead>
@@ -236,7 +236,7 @@
                 @php($probs = $ap->problems())
                 <tr>
                     <td><strong>{{ $ap->name }}</strong> <span class="muted small">{{ $ap->model }}</span></td>
-                    <td>@can('locations.manage')<input name="area[{{ $ap->id }}]" value="{{ $ap->area }}" list="areas" class="area-input" placeholder="{{ __('z. B. Terrasse') }}">@else{{ $ap->areaLabel() }}@endcan</td>
+                    <td>@can('locations.manage')<select name="area[{{ $ap->id }}]" class="area-input"><option value="">{{ __('– ohne Bereich –') }}</option>@foreach($areas as $ar)<option value="{{ $ar }}" @selected($ap->area === $ar)>{{ $ar }}</option>@endforeach @if($ap->area && ! in_array($ap->area, $areas, true))<option value="{{ $ap->area }}" selected>{{ $ap->area }}</option>@endif</select>@else{{ $ap->areaLabel() }}@endcan</td>
                     <td class="num">{{ $ap->clients }}</td>
                     <td class="num">{{ $ap->peak_clients }}</td>
                     <td class="num">{{ $ap->retries_pct === null ? '–' : number_format($ap->retries_pct, 1, ',', '').' %' }}</td>
