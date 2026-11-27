@@ -89,7 +89,7 @@ class MultiConsoleTest extends TestCase
     public function test_403_explains_owner_requirement(): void
     {
         Http::fake(['api.ui.com/*' => Http::response(['message' => 'insufficient permissions for this host'], 403)]);
-        $this->expectExceptionMessage('Owner');
+        $this->expectExceptionMessage('UniFi-Anwendungen');
         UnifiCloudClient::forLocation($this->woergl)->sites();
     }
 }

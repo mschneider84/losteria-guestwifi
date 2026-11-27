@@ -2,12 +2,15 @@
 
 // Oberster Eintrag = aktuelle Version (App\Support\Version). Neueste zuerst.
 return [
-    ['version' => '1.4.0', 'build' => 8, 'date' => '2026-11-27 08:20', 'type' => 'new', 'area' => 'Standorte', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
+    ['version' => '1.4.1', 'build' => 9, 'date' => '2026-11-27 08:06', 'type' => 'fix', 'area' => 'UniFi', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
+        'text' => 'Bei „keine Berechtigung für diese Konsole“ steht jetzt die richtige Ursache: Der API-Schlüssel braucht neben „Site Manager“ auch den Bereich „UniFi-Anwendungen“ (Network) mit den Sites der Restaurants.',
+        'text_en' => 'A “no permission for this console” error now names the real cause: besides “Site Manager” the API key needs the “UniFi applications” (Network) scope with the restaurants’ sites.'],
+    ['version' => '1.4.0', 'build' => 8, 'date' => '2026-11-27 08:02', 'type' => 'new', 'area' => 'Standorte', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
         'text' => 'Jedes Restaurant bekommt seine eigene UDM: unter Standorte → Bearbeiten die UniFi-Konsole wählen (optional mit eigenem API-Schlüssel). Freischaltung, Netzwerk-Auswertungen und „Verbindung testen“ nutzen die Konsole des jeweiligen Standorts; die Gästeseite erkennt das Restaurant am Access Point oder an der IP der UDM.',
         'text_en' => 'Each restaurant gets its own UDM: pick the UniFi console under Locations → Edit (optionally with its own API key). Authorization, network analytics and “Test connection” use that location’s console; the guest page recognises the restaurant by access point or the UDM’s IP.'],
-    ['version' => '1.4.0', 'build' => 8, 'date' => '2026-11-27 08:20', 'type' => 'fix', 'area' => 'UniFi', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
-        'text' => 'Bei „keine Berechtigung für diese Konsole“ steht jetzt die Ursache dabei: Über die Cloud klappt es nur mit dem Schlüssel des Kontos, dem die UDM gehört. Die Konsolenliste markiert UDMs, auf die das Konto nur Admin-Zugriff hat.',
-        'text_en' => 'A “no permission for this console” error now names the cause: the cloud only works with a key from the account that owns the UDM. The console list marks UDMs where the account only has admin access.'],
+    ['version' => '1.4.0', 'build' => 8, 'date' => '2026-11-27 08:02', 'type' => 'fix', 'area' => 'UniFi', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
+        'text' => 'Die Konsolenliste markiert UDMs, auf die das Konto nur Admin-Zugriff hat.',
+        'text_en' => 'The console list marks UDMs where the account only has admin access.'],
     ['version' => '1.3.1', 'build' => 7, 'date' => '2026-11-27 07:58', 'type' => 'fix', 'area' => 'Einstellungen', 'audience' => 'admin', 'source' => null, 'module' => 'unifi',
         'text' => 'Nach dem Speichern des UniFi-API-Schlüssels werden die Konsolen gleich geladen; bei nur einer UDM wird sie automatisch übernommen, sonst erscheint eine Auswahl. Der Knopf „Konsolen laden“ steht jetzt direkt am Feld, die Felder für „Direkt“ sind im Cloud-Modus ausgeblendet.',
         'text_en' => 'After saving the UniFi API key the consoles are loaded right away; a single UDM is selected automatically, otherwise a list appears. The “Load consoles” button now sits next to the field, and the “direct” fields are hidden in cloud mode.'],

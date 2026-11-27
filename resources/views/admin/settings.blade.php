@@ -51,7 +51,7 @@
                 @if($localOnly)</div>@endif
             @endforeach
             @if($group === 'unifi')
-                <p class="muted small">{{ __('Über die UniFi-Cloud braucht es weder VPN noch Portfreigabe: API-Schlüssel unter unifi.ui.com → API anlegen und speichern. Die UDM jedes Restaurants wählst du dann unter Standorte → Bearbeiten. Wichtig: Der Schlüssel muss vom UI-Konto stammen, dem die Konsolen gehören (Owner) – als Admin eingeladene Konten bekommen über die Cloud „keine Berechtigung“.') }}</p>
+                <p class="muted small">{{ __('Über die UniFi-Cloud braucht es weder VPN noch Portfreigabe: API-Schlüssel unter unifi.ui.com → API anlegen und speichern. Die UDM jedes Restaurants wählst du dann unter Standorte → Bearbeiten. Wichtig: Beim Anlegen des Schlüssels zusätzlich zu „Site Manager“ den Bereich „UniFi-Anwendungen“ (Network) anhaken und alle Sites auswählen – mit „Site Manager – Nur Lesen“ allein meldet die Cloud „keine Berechtigung“.') }}</p>
                 <div class="row">
                     <button class="btn ghost" formaction="{{ route('admin.settings.unifi-test') }}" formmethod="post" name="_method" value="POST">🔌 {{ __('Verbindung testen') }}</button>
                 </div>

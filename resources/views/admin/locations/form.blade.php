@@ -29,7 +29,7 @@
         @if($location->unifi_wan_ip)<p class="muted small">{{ __('Öffentliche IP der UDM: :ip – darüber erkennt die Gästeseite das Restaurant.', ['ip' => $location->unifi_wan_ip]) }}</p>@endif
         <details class="small">
             <summary>{{ __('Eigener API-Schlüssel für diese Konsole (optional)') }}</summary>
-            <p class="muted">{{ __('Nur nötig, wenn diese UDM einem anderen UI-Konto gehört. Über die Cloud klappt es nur mit einem Schlüssel des Kontos, dem die Konsole gehört (Owner).') }}</p>
+            <p class="muted">{{ __('Nur nötig, wenn diese UDM einem anderen UI-Konto gehört oder der Standard-Schlüssel diese Site nicht enthält. Der Schlüssel braucht den Bereich „UniFi-Anwendungen“ (Network) mit dieser Site.') }}</p>
             <input type="password" name="unifi_api_key" autocomplete="new-password" placeholder="{{ $location->unifi_api_key ? '•••••••• '.__('(gespeichert – leer lassen, um es zu behalten)') : __('leer = Schlüssel aus den Einstellungen') }}">
             @if($location->unifi_api_key)<label class="inline"><input type="checkbox" name="unifi_api_key_remove" value="1"> {{ __('Eigenen Schlüssel entfernen') }}</label>@endif
         </details>

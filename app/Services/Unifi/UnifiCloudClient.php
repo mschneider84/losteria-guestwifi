@@ -235,7 +235,7 @@ class UnifiCloudClient implements UnifiClient
         }
         $hint = match ($response->status()) {
             401 => 'API-Schlüssel ungültig',
-            403 => 'keine Berechtigung für diese Konsole – über die Cloud klappt es nur mit einem API-Schlüssel des UI-Kontos, dem die Konsole gehört (Owner), nicht eines Admins',
+            403 => 'keine Berechtigung für diese Konsole – der API-Schlüssel braucht unter unifi.ui.com → API-Schlüssel den Bereich „UniFi-Anwendungen“ (Network) mit dieser Site; „Site Manager – Nur Lesen“ reicht nicht',
             404 => 'Konsole oder Eintrag nicht gefunden',
             408, 504 => 'Konsole antwortet nicht (offline?)',
             429 => 'zu viele Anfragen an die UniFi-Cloud',

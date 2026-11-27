@@ -55,7 +55,7 @@ Alternative „Direkt“ (nur mit VPN oder Freigabe): lokaler Benutzer auf der U
 
 ### 1b. Eine UDM je Restaurant
 
-Jeder Standort bekommt unter **Standorte → Bearbeiten → UniFi-Konsole** seine eigene UDM SE. Ein API-Schlüssel für das UI-Konto reicht für alle Konsolen, die diesem Konto **gehören**. Ist eine Konsole nur als Admin geteilt (Liste zeigt „nur Admin-Zugriff“), lehnt die Cloud mit 403 „insufficient permissions for this host“ ab. Abhilfe: Eigentum der Konsole auf das Konto übertragen (unifi.ui.com → Konsole → Einstellungen → Owner) oder beim Standort einen eigenen Schlüssel des Eigentümer-Kontos hinterlegen.
+Jeder Standort bekommt unter **Standorte → Bearbeiten → UniFi-Konsole** seine eigene UDM SE. Ein API-Schlüssel reicht für alle Restaurants, wenn er richtig angelegt ist: unter unifi.ui.com → API-Schlüssel → *Neuen API-Schlüssel erstellen* sowohl **Site Manager** als auch **UniFi-Anwendungen** (Network) anhaken und **alle Sites** auswählen. Ein Schlüssel nur mit „Site Manager – Nur Lesen“ listet die Konsolen, aber jeder Zugriff auf die UDM endet mit 403 „insufficient permissions for this host“. Neue Restaurants später auch im Schlüssel freigeben (oder beim Standort einen eigenen Schlüssel hinterlegen).
 
 Weil jede UDM die Site meist „default“ meldet, erkennt die Gästeseite das Restaurant am Access Point (aus den Netzwerk-Daten), an der öffentlichen IP der UDM oder – falls beides nicht klappt – lässt den Gast einmal wählen.
 
